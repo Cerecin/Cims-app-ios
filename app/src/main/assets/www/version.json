@@ -1,0 +1,747 @@
+{
+ "v": 85,
+ "name": "14/10/2026",
+ "notes": "Versió web per a l'iPhone (PWA): estat a IndexedDB, actualitzacions amb service worker, marges de l'iPhone i compartir fitxers.",
+ "files": [
+  {
+   "p": "alps.js",
+   "s": "5d9458d90c1d1b4bdd77d6087dea20a631916a0f9016ecdc84546a4860e9f33f",
+   "n": 17828
+  },
+  {
+   "p": "app.js",
+   "s": "84ab75d8d1c88e1aeb796d88ceb862fef035525b1f1f217744ef05625cab8b8a",
+   "n": 299182
+  },
+  {
+   "p": "comarques.js",
+   "s": "c1478e602630a31d19d60c3d41c5b554fd00f04d995a30192b165830b85742bd",
+   "n": 133026
+  },
+  {
+   "p": "data.js",
+   "s": "598647a1f73d31a5c0b51bc881a8f099b4b8ff65885ce788fe876ef22171685c",
+   "n": 165685
+  },
+  {
+   "p": "icons/apple-touch-icon.png",
+   "s": "9f31587082c3021858dbcc114076941eca48876fbcd2679a7619bd400b358687",
+   "n": 6023
+  },
+  {
+   "p": "icons/icon-192.png",
+   "s": "7cd577d5ed6ed16aa785673205334231c2aca7b575116df5b1499cef8d23033b",
+   "n": 6376
+  },
+  {
+   "p": "icons/icon-512.png",
+   "s": "7941527df0d568917a710a04378b400e6a9575058e8e26bbafd84d7d1e3e1ebe",
+   "n": 23212
+  },
+  {
+   "p": "icons/icon-maskable-512.png",
+   "s": "7941527df0d568917a710a04378b400e6a9575058e8e26bbafd84d7d1e3e1ebe",
+   "n": 23212
+  },
+  {
+   "p": "index.html",
+   "s": "20965a760a554eb83671af149d8444a734056e2e4b71ea1df997f50c1c8ffdef",
+   "n": 6484
+  },
+  {
+   "p": "kmz.js",
+   "s": "4319276798a6fb44c871b50b9b15c9df8e9fffb2274e416b21a77093f758544a",
+   "n": 5770
+  },
+  {
+   "p": "lib/fitsdk.min.js",
+   "s": "e35629b120aa4d011ccf6706b914db4dc6da4c0b70263e50a1b141a4c3888874",
+   "n": 429298
+  },
+  {
+   "p": "lib/fonts/fraunces.woff2",
+   "s": "7f9d191d999336d3b9790afa72e1358e50a13b06d4f289341e92a311967a80f9",
+   "n": 36620
+  },
+  {
+   "p": "lib/fonts/inter.woff2",
+   "s": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+   "n": 48256
+  },
+  {
+   "p": "lib/images/layers-2x.png",
+   "s": "066daca850d8ffbef007af00b06eac0015728dee279c51f3cb6c716df7c42edf",
+   "n": 1259
+  },
+  {
+   "p": "lib/images/layers.png",
+   "s": "1dbbe9d028e292f36fcba8f8b3a28d5e8932754fc2215b9ac69e4cdecf5107c6",
+   "n": 696
+  },
+  {
+   "p": "lib/images/marker-icon-2x.png",
+   "s": "00179c4c1ee830d3a108412ae0d294f55776cfeb085c60129a39aa6fc4ae2528",
+   "n": 2464
+  },
+  {
+   "p": "lib/images/marker-icon.png",
+   "s": "574c3a5cca85f4114085b6841596d62f00d7c892c7b03f28cbfa301deb1dc437",
+   "n": 1466
+  },
+  {
+   "p": "lib/images/marker-shadow.png",
+   "s": "264f5c640339f042dd729062cfc04c17f8ea0f29882b538e3848ed8f10edb4da",
+   "n": 618
+  },
+  {
+   "p": "lib/jszip.min.js",
+   "s": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+   "n": 97630
+  },
+  {
+   "p": "lib/leaflet.css",
+   "s": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+   "n": 14806
+  },
+  {
+   "p": "lib/leaflet.js",
+   "s": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+   "n": 147552
+  },
+  {
+   "p": "manifest.webmanifest",
+   "s": "141bc22e5bdd7dd4a9f83fb585318230562ab45a08dcfaa7e4fc3e0179176658",
+   "n": 663
+  },
+  {
+   "p": "medals.js",
+   "s": "05abf21a4fff7b1e41f81f781b60af04de5adfd6b7ac54b26710f8a279a5de7f",
+   "n": 9483
+  },
+  {
+   "p": "medals/a50.webp",
+   "s": "3a3c2cfc3d71a965616a762ba11b1d2ba4c122dc47e17fd5dc5f72eb61f223e2",
+   "n": 61302
+  },
+  {
+   "p": "medals/aall.webp",
+   "s": "8df20b0c4e02dcf8dcf6a5c2df3db912d19579057ee1d0b4b11a602e202a4649",
+   "n": 76502
+  },
+  {
+   "p": "medals/agol.webp",
+   "s": "fafc7a24f4a790238f7caf0cfc32c5cf3e4873bca5aa0892004e9b05fb7f818a",
+   "n": 66874
+  },
+  {
+   "p": "medals/ahalf.webp",
+   "s": "8c7105104296ce960079be7dbe5d5ca5361f158ba2e3fa9e8badd4fcca524a2b",
+   "n": 72408
+  },
+  {
+   "p": "medals/c100.webp",
+   "s": "c4d3660ce718ceb31f528ad54df6bb27115fb1bcfce04956ca5cafd48f7807a3",
+   "n": 84426
+  },
+  {
+   "p": "medals/c150.webp",
+   "s": "fbd28cd3974957bfb3f6781d04eb49762a2f005e0180f612c8cb066b7da7a7bc",
+   "n": 79816
+  },
+  {
+   "p": "medals/c200.webp",
+   "s": "814ce6b1e3465c97d24ff2cf67f63eee5c9bbf8a2e3968fdd6fc08652645b6ce",
+   "n": 98946
+  },
+  {
+   "p": "medals/c250.webp",
+   "s": "f240e80f30f9986bd32aee3f7c90981d7dd39e0d46a6949863b7ae95408cfa05",
+   "n": 95964
+  },
+  {
+   "p": "medals/c300.webp",
+   "s": "9bfe7ccf84ae1b756766241a6b6a79373e089d76bc2268a6037783aff75bcc24",
+   "n": 95372
+  },
+  {
+   "p": "medals/c350.webp",
+   "s": "24d5e11fd311aa4f52384b135b7fc20da0852c69e7420b33e87642ff4cbc8591",
+   "n": 78816
+  },
+  {
+   "p": "medals/c400.webp",
+   "s": "70912c2ee9d23383ffd9c75839bc763daabbf777861f5fe26cccaaa63590f6a7",
+   "n": 90116
+  },
+  {
+   "p": "medals/c450.webp",
+   "s": "44fef350f07c35e1e7a65e328c82eb923a2d73b21310a44883b71f8acd394a2e",
+   "n": 89628
+  },
+  {
+   "p": "medals/c50.webp",
+   "s": "f2308af17a2f9d6f91a693cf0741e1e0cb4c71b8df282e49bbe4ca1e8c3c8644",
+   "n": 80760
+  },
+  {
+   "p": "medals/c500.webp",
+   "s": "512ac55bc8822b7a757acbf72eb8a2864373aad536eeb50158ad119cf1c3404b",
+   "n": 81546
+  },
+  {
+   "p": "medals/ca_alt_camp.webp",
+   "s": "ac97286031f96a43b88456a96b530fd339072eb518f8ace707b4faf5e67c9ced",
+   "n": 36888
+  },
+  {
+   "p": "medals/ca_alt_emporda.webp",
+   "s": "42a341bff5b0db0fe410a6e555e680306f977e5707660161c4f898f36fda6b46",
+   "n": 37514
+  },
+  {
+   "p": "medals/ca_alt_penedes.webp",
+   "s": "3c5101746fbb536428ad445c601935e8df1d57c7bdbd7ff3907eb08eae90d41c",
+   "n": 37806
+  },
+  {
+   "p": "medals/ca_alt_urgell.webp",
+   "s": "f57f13cebb6b95f62510801a5c7d94142ceb844a66d2ef4ffb0a5745d8c84e3f",
+   "n": 37032
+  },
+  {
+   "p": "medals/ca_alta_ribagorca.webp",
+   "s": "277b231ec442dcf880111ed9c1d44d832177c0c5ed4eec31b99c3f6135b590bf",
+   "n": 38132
+  },
+  {
+   "p": "medals/ca_andorra.webp",
+   "s": "4377a87dfd8a12f054b7fb09b19783d415d801824a28e3154e2167773f35c376",
+   "n": 36410
+  },
+  {
+   "p": "medals/ca_anoia.webp",
+   "s": "33f213461622983e623df22cbb6b62a36879aae6eacb4a126da5ee4247ac936d",
+   "n": 37170
+  },
+  {
+   "p": "medals/ca_bages.webp",
+   "s": "d20410929ce46db1fab0f703acfdbdf3c3a4c2a742270300c3d27e18fb6aa059",
+   "n": 37986
+  },
+  {
+   "p": "medals/ca_baix_camp.webp",
+   "s": "ef14e362d97aef7908d5f7b3ad4d8c97a260da0a67521567203aeea6071368f3",
+   "n": 37334
+  },
+  {
+   "p": "medals/ca_baix_ebre.webp",
+   "s": "12656cd14e763ac28c9d74b37e79003e193e4e0b33ed50dac5c7eaafe5538bb7",
+   "n": 37180
+  },
+  {
+   "p": "medals/ca_baix_emporda.webp",
+   "s": "139f329ba1e43508a0528f33b91d6ea6edfe217a1d737a84cdde9c541488080d",
+   "n": 37724
+  },
+  {
+   "p": "medals/ca_baix_llobregat.webp",
+   "s": "c7f1112f00fb9545302fe4ab7c02a034f5e0367aac478993b4306bd12851b7b4",
+   "n": 37694
+  },
+  {
+   "p": "medals/ca_baix_penedes.webp",
+   "s": "e012a93f8a397e53a67b64e4cd28686e9944c4fba7bd85bd67a816abb24fb557",
+   "n": 38254
+  },
+  {
+   "p": "medals/ca_barcelones.webp",
+   "s": "3022a64c10ad18b40a64a95d0cdc412a6e6a0a6c69b8cdbf2a5e507fb55ab12f",
+   "n": 37880
+  },
+  {
+   "p": "medals/ca_bergueda.webp",
+   "s": "444599c1e27b5104183b97d9a46ceda95263d9381e5409fd6540def39d6ab9eb",
+   "n": 38642
+  },
+  {
+   "p": "medals/ca_capcir.webp",
+   "s": "5329bc297b9dbed6962e852ac0e26eef4d3c4cc249dd70eac24ecf6850818e18",
+   "n": 36374
+  },
+  {
+   "p": "medals/ca_cerdanya.webp",
+   "s": "5c46c0b005cabf22e617441502326dbd2ac0e0d7e3d678dc10bf89466663677e",
+   "n": 37050
+  },
+  {
+   "p": "medals/ca_cerdanya_nord.webp",
+   "s": "d9accb9dec36d0a028182937beeaeae991af6f5b2b0c2ee8d83392c5d503c22c",
+   "n": 37976
+  },
+  {
+   "p": "medals/ca_conca_de_barbera.webp",
+   "s": "c5be5b1ad37c91ebcacc4b75657247f1152340239446d0d95e263218f6ad1ca9",
+   "n": 38102
+  },
+  {
+   "p": "medals/ca_conflent.webp",
+   "s": "6dcb3c37037eacef65736bc808e505e301d18a85124c281d13289db2cc3dc168",
+   "n": 36970
+  },
+  {
+   "p": "medals/ca_garrigues.webp",
+   "s": "32867406b1cf694718dcef22f537342591e870857c44f70777ef0f7ba5f1dec2",
+   "n": 37658
+  },
+  {
+   "p": "medals/ca_garrotxa.webp",
+   "s": "27fdf38a2c7999eb8e90c8022b0d42bbac60711476d4b51b4208bd8400810524",
+   "n": 37798
+  },
+  {
+   "p": "medals/ca_girones.webp",
+   "s": "3916b109577d6ecc582c108926d8c058d8115e3ea17b8d91f129a07043a6f21a",
+   "n": 37176
+  },
+  {
+   "p": "medals/ca_llucanes.webp",
+   "s": "e28cd40bdb42cabe58f7bb1c235026ffecd3f133cee4a0b209251b169d0e0392",
+   "n": 37260
+  },
+  {
+   "p": "medals/ca_maresme.webp",
+   "s": "473a5f673ea71c9da1c5167246b2432c44f0037ffda9b5bab28eabc59a5b896f",
+   "n": 36834
+  },
+  {
+   "p": "medals/ca_moianes.webp",
+   "s": "b309b0f4131759972e999992fcae315e630e25625bb55467b7a6276814a9af5d",
+   "n": 37134
+  },
+  {
+   "p": "medals/ca_montsia.webp",
+   "s": "8dde28382f85fb2eaade83d2a6a222fd2519830820a324d0afbd58fb9e41d650",
+   "n": 36664
+  },
+  {
+   "p": "medals/ca_noguera.webp",
+   "s": "04cf8853ecf6e81a7721a16592bdc4d4eb1088bc9e29163cd9cd25394850fb5b",
+   "n": 37368
+  },
+  {
+   "p": "medals/ca_osona.webp",
+   "s": "52cdb26827d0605bbe6d55ea17c27970607e019e85810920584de3ad472dcf9a",
+   "n": 36430
+  },
+  {
+   "p": "medals/ca_pallars_jussa.webp",
+   "s": "9183ba38a1f124d51fec356197023c4c36fe8b38e8472cf504472a9ae04cac3f",
+   "n": 38102
+  },
+  {
+   "p": "medals/ca_pallars_sobira.webp",
+   "s": "740c016f697ef64666a07fbf9e8d5526d44b6a10db49714ab2d8992fd2dd207d",
+   "n": 37754
+  },
+  {
+   "p": "medals/ca_pla_d_urgell.webp",
+   "s": "91a0c604692117e84f2851a1c60c2b5a18b212ee80ebf746b93588fcd26ac602",
+   "n": 37720
+  },
+  {
+   "p": "medals/ca_pla_de_l_estany.webp",
+   "s": "6b80933458b159d0a79a677056850a8e25f3f598804f0b21aca19945b5ee3788",
+   "n": 37570
+  },
+  {
+   "p": "medals/ca_priorat.webp",
+   "s": "da3c4e37f28b1efbd69d264e76be7b2e8042e593bd4db43632a28ebf930bc888",
+   "n": 36730
+  },
+  {
+   "p": "medals/ca_ribera_d_ebre.webp",
+   "s": "e9e0f1decb210f94633f7dfe4e082da1e9bd2dfff4624cbee52a9ff6ca7ed0e8",
+   "n": 38354
+  },
+  {
+   "p": "medals/ca_ripolles.webp",
+   "s": "90f7cdc197d628eb9525a7a7f4fe37cb8a5ccffbd56ca1d863af59d01f3b5587",
+   "n": 37612
+  },
+  {
+   "p": "medals/ca_rossello.webp",
+   "s": "1233b84c7ed7e7e3d0814fda8eb55c3c84db6225b7bea8c6d2131acb02ad770d",
+   "n": 37382
+  },
+  {
+   "p": "medals/ca_segarra.webp",
+   "s": "3ab6711edaa158fe46f3deae0ea060d7127c5ca73a4c5c2bdea6c3f6c94e8099",
+   "n": 37014
+  },
+  {
+   "p": "medals/ca_segria.webp",
+   "s": "34a3df80149a5e0ee3ab55d4745b522c441ae08294276c7489d5a4ba7b449f01",
+   "n": 36602
+  },
+  {
+   "p": "medals/ca_selva.webp",
+   "s": "d2f2584af3113a51d89671d3d869364b38078dcb2885086a49c7912de48632ad",
+   "n": 37002
+  },
+  {
+   "p": "medals/ca_solsones.webp",
+   "s": "77fa573058c9b7b04a65b3611e974600b4f43ecf8e0428e8d312ca3a621a8049",
+   "n": 38038
+  },
+  {
+   "p": "medals/ca_tarragones.webp",
+   "s": "d270c7172aa136ba86150d83333a9bd40a6ef08a5e523c3e342659a9a3323d89",
+   "n": 37848
+  },
+  {
+   "p": "medals/ca_terra_alta.webp",
+   "s": "c9063501cbf7eb3acb67cb33522349a8f3c20344dd7700729e3aedc98a3ca707",
+   "n": 37194
+  },
+  {
+   "p": "medals/ca_urgell.webp",
+   "s": "af2e6619c7343dee6c2beed00ce0094d8b398da85dfd8944b50b53c0c0e2ddfd",
+   "n": 36682
+  },
+  {
+   "p": "medals/ca_val_d_aran.webp",
+   "s": "36a959727fc81c206a26fce1093edcbae093bd251ec8fc93ef2b615bfa724e36",
+   "n": 36778
+  },
+  {
+   "p": "medals/ca_valles_occidental.webp",
+   "s": "176d448ed7b7f6a1aabf097b5bf34de9cdde012e55a06c85fad25c1fe0ffac8c",
+   "n": 38080
+  },
+  {
+   "p": "medals/ca_valles_oriental.webp",
+   "s": "868f90ad18ae740722295a1f60f521d5bf126cbd61df8f3c389f36deb21db14c",
+   "n": 37874
+  },
+  {
+   "p": "medals/ca_vallespir.webp",
+   "s": "430ee4f3c382fa712e955cf7a4004c9d6d369c4f1545d36ab3af6bb736530d03",
+   "n": 36826
+  },
+  {
+   "p": "medals/call.webp",
+   "s": "499e4681563d4bbb6d0818101731aec211fa09801cd4935590d57e382e97263a",
+   "n": 67464
+  },
+  {
+   "p": "medals/cat.webp",
+   "s": "2a5ee1da26893bd04c430abe498e5900338d675f1ffe1fb21cadfb1343dfe339",
+   "n": 81762
+  },
+  {
+   "p": "medals/ce_alt_camp.webp",
+   "s": "70e232acbaa6752f4b5470248b0522a4be659da9da13f720dd1ae13f1632a26b",
+   "n": 31118
+  },
+  {
+   "p": "medals/ce_alt_emporda.webp",
+   "s": "cdf18c1cf82a7d180f4bcc923ac7717f1e9dd764a60f1c622f2cc8bb2e87d19b",
+   "n": 31616
+  },
+  {
+   "p": "medals/ce_alt_penedes.webp",
+   "s": "3a170976975d8d12f946a6475eb1a068740aca7abec017ce50edbec5f8422494",
+   "n": 32082
+  },
+  {
+   "p": "medals/ce_alt_urgell.webp",
+   "s": "a213a598a1dcd0f81e5e825a1c5000fbdfa646eeb89b8d73e986030778d5a550",
+   "n": 31232
+  },
+  {
+   "p": "medals/ce_alta_ribagorca.webp",
+   "s": "a33aee3ff5dc102201af25f5a9757bbd18774be14889a891346b55733d157f6c",
+   "n": 32094
+  },
+  {
+   "p": "medals/ce_andorra.webp",
+   "s": "84a43dd2254ef915badc5ee6344c347d0723d034bfc794341a0cd64c2917f9b2",
+   "n": 30624
+  },
+  {
+   "p": "medals/ce_anoia.webp",
+   "s": "0808d334ba5c175b9d2f3a09c85a06e3c93e97c4e952b70c44210879e3abe019",
+   "n": 31370
+  },
+  {
+   "p": "medals/ce_bages.webp",
+   "s": "990ad63118882ef9f80813f84fe01c517f5e89eb330ae504a52cf2260b347abc",
+   "n": 32094
+  },
+  {
+   "p": "medals/ce_baix_camp.webp",
+   "s": "36b012fd36733e3b54a21c7ddb73aab723c353c9446a67bd15ecbd4be619dbd8",
+   "n": 31530
+  },
+  {
+   "p": "medals/ce_baix_ebre.webp",
+   "s": "3693194c53b4324110371544dbbc24f48128b9ec111ff3b1df1acd18b23f7c04",
+   "n": 31344
+  },
+  {
+   "p": "medals/ce_baix_emporda.webp",
+   "s": "258c87171b90baf126e2906cd91161af56f848eddcc0f51a172017c6fe784c57",
+   "n": 31978
+  },
+  {
+   "p": "medals/ce_baix_llobregat.webp",
+   "s": "24d53134df656cbbc4fbdc309d00ccf9900e73a6d19e869b1ec9b10354c647cb",
+   "n": 31934
+  },
+  {
+   "p": "medals/ce_baix_penedes.webp",
+   "s": "eb1e703497925d3a967df315225171719ad06be5831fb9d96a4a4181a65a4106",
+   "n": 32392
+  },
+  {
+   "p": "medals/ce_barcelones.webp",
+   "s": "d8f98501c847981263926daa8500257a6428087a05bca4ea8f661fdb9516d6b3",
+   "n": 31946
+  },
+  {
+   "p": "medals/ce_bergueda.webp",
+   "s": "4c02dd0b730f138df2f2db0890292451b46c58d719e2eec3309ccde6a8fd99ad",
+   "n": 32788
+  },
+  {
+   "p": "medals/ce_capcir.webp",
+   "s": "13c71162ca110191bda878edd8ebbbf7320b54ccc6500b07d239f84a6b16bd31",
+   "n": 33972
+  },
+  {
+   "p": "medals/ce_cerdanya.webp",
+   "s": "ef9510ec3eec38bbaa4ec9f859ddad9bc023c8a347578d140a3a62e8e74ebc55",
+   "n": 31282
+  },
+  {
+   "p": "medals/ce_cerdanya_nord.webp",
+   "s": "816cbdb25e422b475bb6eca5f67a0bb95ad436131ea1c9c70e9bab4a0f33f1f9",
+   "n": 32112
+  },
+  {
+   "p": "medals/ce_conca_de_barbera.webp",
+   "s": "3b6a9cac3ba9c16b0c060b2ed5f3fd0f4e177c8c7f37aa95406d8ea59aff89ea",
+   "n": 32182
+  },
+  {
+   "p": "medals/ce_conflent.webp",
+   "s": "bef93ddc00a2cb8d02175ae374bdfea6ecbac9f23eddc95935e66c2c013893c7",
+   "n": 31138
+  },
+  {
+   "p": "medals/ce_garrigues.webp",
+   "s": "ffac911b5da2e197fac659fd7e2bc9ef61c12d54448953c7ccf330fc1063739a",
+   "n": 31924
+  },
+  {
+   "p": "medals/ce_garrotxa.webp",
+   "s": "9ce63b6078f0b82d73af2217eb896b9fe43fe2433486ec0b6e1bba1d67e54780",
+   "n": 31972
+  },
+  {
+   "p": "medals/ce_girones.webp",
+   "s": "5669e074cce5330d27fe01c2aded79552873be848648c32cdeb0afd9c6f05607",
+   "n": 31764
+  },
+  {
+   "p": "medals/ce_maresme.webp",
+   "s": "9f53449ffc28857c94ce5919ee6b5d1bf952379c3b2417453259cc12a1347b72",
+   "n": 31086
+  },
+  {
+   "p": "medals/ce_moianes.webp",
+   "s": "458a0be1bee9d25224a4d6ddd56bf571e0e1dbfab24ed2809fbb6250639a3943",
+   "n": 31324
+  },
+  {
+   "p": "medals/ce_montsia.webp",
+   "s": "ec98e485163b5d096813ce09e54248a6d01d10cf846c434219c483540fb98383",
+   "n": 30882
+  },
+  {
+   "p": "medals/ce_noguera.webp",
+   "s": "f4ab41670d210a0bed4d81c553521bbab0881b03176108efca32e1741662e7c2",
+   "n": 31536
+  },
+  {
+   "p": "medals/ce_osona.webp",
+   "s": "abe6d485c5a01e37a87b916ccdaff5fe824d314b128fde0988a0f7831795a3de",
+   "n": 30958
+  },
+  {
+   "p": "medals/ce_pallars_jussa.webp",
+   "s": "406ad1da2fcf13f7fafaa6f50a6d63f7752a1aba9f142a92d4854103d939b700",
+   "n": 32352
+  },
+  {
+   "p": "medals/ce_pallars_sobira.webp",
+   "s": "7d3245c5becdea261e8f01bf40c60b670744f2c3d0e8ca8798a9d5433498d052",
+   "n": 32230
+  },
+  {
+   "p": "medals/ce_pla_d_urgell.webp",
+   "s": "285c69e310b8562c30c8f62411b920d246ff08cf76ec64f4365aca028d398791",
+   "n": 32004
+  },
+  {
+   "p": "medals/ce_pla_de_l_estany.webp",
+   "s": "4c63e45c6417f3633c47c6ba66b31c4917269c03f70130fee466f8d20aba24e3",
+   "n": 31822
+  },
+  {
+   "p": "medals/ce_priorat.webp",
+   "s": "de1057b9023c4dbaa1b2ed48f47595c355de4c921eec4ba30120c616d7d22531",
+   "n": 30976
+  },
+  {
+   "p": "medals/ce_ribera_d_ebre.webp",
+   "s": "393c0a41a60ad34dc4768116c4ff7ef81072f758ec947386d9e6169115bcd192",
+   "n": 32564
+  },
+  {
+   "p": "medals/ce_ripolles.webp",
+   "s": "567a5d76e140fb36a8b85eea8073fe351bad869d8ae5be47c5e82f1b3c58c2d1",
+   "n": 31580
+  },
+  {
+   "p": "medals/ce_rossello.webp",
+   "s": "16d2372557563d19d7a1299595c83e07017ce3f9f30f980ac03d61dc396b92a7",
+   "n": 31692
+  },
+  {
+   "p": "medals/ce_segarra.webp",
+   "s": "4609b299dc5b0662f782aa1358739d3f1c1564f959501234e6dfccb7f3f5142a",
+   "n": 31188
+  },
+  {
+   "p": "medals/ce_segria.webp",
+   "s": "a7203a12b8bacb7a7357bb1d4a06d3b98fb9258b8488963218f46abbad251fd2",
+   "n": 30934
+  },
+  {
+   "p": "medals/ce_selva.webp",
+   "s": "a3614e776060a1fb6b143df7d5b4e7b69db440ce86377e4c89309b02d31cba45",
+   "n": 31166
+  },
+  {
+   "p": "medals/ce_solsones.webp",
+   "s": "0694727f5b3c9f8c3034eca14b616764d7aa6064cfd329f9b0086b878b39688b",
+   "n": 32174
+  },
+  {
+   "p": "medals/ce_terra_alta.webp",
+   "s": "79b70b948b782492be33a2bb4731c4127c9efafb2619e74ed5413d2cc2463e15",
+   "n": 31426
+  },
+  {
+   "p": "medals/ce_urgell.webp",
+   "s": "9eeaceb1f130657c40326b5b90eafa1e2cc9a68e50299f263321f5dad64710d9",
+   "n": 31120
+  },
+  {
+   "p": "medals/ce_val_d_aran.webp",
+   "s": "f47bd14447ca241602a1046b7c305325ae813396e7adaa37e7bc874cb61b3161",
+   "n": 31070
+  },
+  {
+   "p": "medals/ce_valles_occidental.webp",
+   "s": "916e566d1a25e62c55637d39e7c30f42893509cc7fc7d58577a27fb8ab9af969",
+   "n": 32268
+  },
+  {
+   "p": "medals/ce_valles_oriental.webp",
+   "s": "08d6ed3e54c3e4d0150917beb00b42b6b57aa883701bbcad901dacb31d3a249e",
+   "n": 31992
+  },
+  {
+   "p": "medals/dia3000.webp",
+   "s": "273ccc4ae4b7d6513f01cbde906640cca5c97b4c14356b55798defc2752ada19",
+   "n": 87326
+  },
+  {
+   "p": "medals/e100.webp",
+   "s": "a4394f4c68405b98a177e67df29129781de9fac7119bd3001d51feb0cf074dcb",
+   "n": 84160
+  },
+  {
+   "p": "medals/eall.webp",
+   "s": "b2607dbeb0bf291f1044f8758e2aa3eb0d24fc9c674e6d84ada76c11c972a220",
+   "n": 85418
+  },
+  {
+   "p": "medals/u1.webp",
+   "s": "4887a7dfd089dcae2b96f3f0a5bd3483a329b6c4aa112364e678e287c66a2fc8",
+   "n": 85664
+  },
+  {
+   "p": "medals/uall.webp",
+   "s": "cc7ee0e730e0b0f004b45e0e7dd970257d199acb2097710a819baddd983b7302",
+   "n": 73380
+  },
+  {
+   "p": "medals/up.webp",
+   "s": "baa4914af0e7c909229a5fde32aa8dee5c6414be04e8010a3a99b4a2eccec6db",
+   "n": 77630
+  },
+  {
+   "p": "medals/zt_z11.webp",
+   "s": "5d8bb007f7a24ce4d2d381dfd9aa829e91afde1545f64b717f073c55fe73878d",
+   "n": 87990
+  },
+  {
+   "p": "medals/zt_z7.webp",
+   "s": "be97bfb88db739d43b95e1a03d741241157cc1f269579c983d481ed490909394",
+   "n": 81582
+  },
+  {
+   "p": "medals/zt_z8.webp",
+   "s": "dee1e888721cca8065401c69f9b92613cd19f81132416602ce7aa44bc3e1cf5a",
+   "n": 86576
+  },
+  {
+   "p": "medals/zt_z9.webp",
+   "s": "913d3ca00257612af295525e6965a5eb6414522d7350c7f46b15501f335d0c62",
+   "n": 68230
+  },
+  {
+   "p": "medimg.js",
+   "s": "65b9d288591fbd21b67972802293d0482c28628d1b9c57f58aa3312f0e358d55",
+   "n": 5259
+  },
+  {
+   "p": "plantilla.xlsx",
+   "s": "2f6782923e7b2561b085188392a46d0b337494cb7fbc508ff0b2cd04c125369d",
+   "n": 117901
+  },
+  {
+   "p": "style.css",
+   "s": "29dd1e4879a001e1711a80355c785982969a115df00e2ca475ed2f59eed3220d",
+   "n": 69071
+  },
+  {
+   "p": "sw.js",
+   "s": "2c58291285f0f48e30b86c8eedcb7265012325b3a4227b5976339913ba7a26be",
+   "n": 3299
+  },
+  {
+   "p": "tracks.js",
+   "s": "bcb0601c0cff1b6af2847dc41a30b8052b1984bdd76647d4c3c523be052da2bf",
+   "n": 13176
+  },
+  {
+   "p": "xlsx.js",
+   "s": "0af286846cd9578c560ef4d47e2c44d8e76cc6d639827184b02ec47cbdbfe993",
+   "n": 18159
+  }
+ ]
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2D5A4A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cims">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>try{var d=document.documentElement;if(!window.Android){d.classList.add('web');if(/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))d.classList.add('ios')}}catch(e){}</script>
+<title>Cims</title>
+<script>try{var t=localStorage.getItem("cimsTheme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="lib/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="top">
+  <div class="top-title" id="topTitle">Cims</div>
+  <div class="top-sub" id="topSub"></div>
+  <svg class="top-sil" viewBox="0 0 390 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46V30l30-12 22 14 36-24 26 20 30-14 34 24 28-18 34 22 30-30 28 26 32-14 30 18V46z" fill="rgba(255,255,255,.10)"/><path d="M0 46V38l40-14 28 16 40-22 30 20 42-12 36 18 36-26 34 24 32-10 32 14V46z" class="top-sil2"/></svg>
+  <button class="icon-btn" id="gsBtn" aria-label="Cerca"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
+  <button class="icon-btn" id="menuBtn" aria-label="Dades i còpies">⋯</button>
+</header>
+
+<main>
+  <!-- RESUM -->
+  <section id="v-resum" class="view active"></section>
+
+  <!-- LLISTES -->
+  <section id="v-llistes" class="view">
+    <div class="tabs2" id="listSeg">
+      <button data-l="feec" class="on">100 Cims</button>
+      <button data-l="uiaa">3000 Pirineu</button>
+      <button data-l="cat">3000 Cat.</button>
+      <button data-l="sostres">Sostres</button>
+      <button data-l="alps">4000</button>
+    </div>
+    <div class="lprog" id="listProg"></div>
+    <div class="toolbar sbar">
+      <input id="q" type="search" placeholder="Cerca un cim…" autocomplete="off">
+      <button id="fltBtn" class="fbtn" aria-label="Filtres">☰ Filtres<em class="hidden"></em></button>
+    </div>
+    <div class="seg2" id="filters"></div>
+    <div class="count" id="listCount"></div>
+    <ul class="list" id="list"></ul>
+  </section>
+
+  <!-- MAPA -->
+  <section id="v-mapa" class="view">
+    <div id="map"></div>
+    <div class="map-ctrl">
+      <button class="fab-s" id="locBtn" title="La meva ubicació">◎</button>
+      <button class="fab-s" id="layerBtn" title="Capes">▤</button>
+    </div>
+    <div class="map-panel hidden" id="layerPanel"></div>
+    <div class="map-hint" id="mapHint">Mantén premut el mapa per afegir un punt</div>
+  </section>
+
+  <!-- FITES -->
+  <section id="v-fites" class="view"></section>
+
+  <!-- ESTADÍSTIQUES -->
+  <section id="v-stats" class="view"></section>
+  <section id="v-diari" class="view"></section>
+
+  <!-- PUNTS -->
+  <section id="v-punts" class="view">
+    <div class="toolbar">
+      <input id="pq" type="search" placeholder="Cerca als meus punts…" autocomplete="off">
+    </div>
+    <div class="chips" id="pfilters"></div>
+    <div class="count" id="pCount"></div>
+    <ul class="list" id="plist"></ul>
+    <h3 class="sec-h rhead" id="rHead">Rutes</h3>
+    <ul class="list" id="rlist"></ul>
+    <button class="fab" id="addPointBtn" aria-label="Afegir punt">＋</button>
+  </section>
+</main>
+
+<nav id="nav">
+  <button data-v="resum" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v8.5h8.5"/></svg>Resum</button>
+  <button data-v="llistes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6.5h12M8 12h12M8 17.5h12"/><circle cx="4" cy="6.5" r=".8"/><circle cx="4" cy="12" r=".8"/><circle cx="4" cy="17.5" r=".8"/></svg>Llistes</button>
+  <button data-v="mapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20 9.5 6l4 8 2.5-4L21 20z"/></svg>Mapa</button>
+  <button data-v="fites"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5.5"/><path d="M8.7 13.6 7 21l5-2.6 5 2.6-1.7-7.4"/></svg>Fites</button>
+  <button data-v="punts"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/></svg>Punts</button>
+</nav>
+
+<div id="scrim" class="hidden"></div>
+<div id="sheet" class="sheet hidden"></div>
+<div id="toast" class="toast hidden"></div>
+<div id="celebrate" class="hidden"></div>
+<input type="file" id="trackIn" class="hidden">
+<input type="file" id="fileIn" accept=".json,application/json,text/plain" class="hidden">
+
+<script src="lib/leaflet.js"></script>
+<script src="lib/jszip.min.js"></script>
+<script src="data.js"></script>
+<script src="alps.js"></script>
+<script src="xlsx.js"></script>
+<script src="comarques.js"></script>
+<script src="kmz.js"></script>
+<script src="tracks.js"></script>
+<script src="medimg.js"></script>
+<script src="medals.js"></script>
+<script>
+/* Versió web: abans d'arrencar l'app es llegeix l'estat desat a IndexedDB (a l'app d'Android arrenca directament). */
+(function () {
+  if (window.Android || !window.indexedDB) { document.write('<script src="app.js"><\/script>'); return; }
+  var done = false;
+  function go() { if (done) return; done = true; var s = document.createElement('script'); s.src = 'app.js'; document.body.appendChild(s); }
+  setTimeout(function () { if (!done) window.__IDB_UNKNOWN = true; go(); }, 8000);
+  try {
+    var r = indexedDB.open('cimsState', 1);
+    r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
+    r.onsuccess = function () {
+      try { var q = r.result.transaction('kv').objectStore('kv').get('state'); q.onsuccess = function () { window.__IDB_STATE = q.result || null; go(); }; q.onerror = function () { window.__IDB_UNKNOWN = true; go(); }; }
+      catch (e) { window.__IDB_UNKNOWN = true; go(); }
+    };
+    r.onerror = function () { window.__IDB_UNKNOWN = true; go(); };
+  } catch (e) { window.__IDB_UNKNOWN = true; go(); }
+})();
+</script>
+</body>
+</html>
