@@ -1,8 +1,8 @@
 {
  "name": "Cims",
  "short_name": "Cims",
- "description": "Seguiment dels cims: 100 Cims, 3000 del Pirineu, sostres comarcals i 4000 dels Alps",
- "lang": "ca",
+ "description": "Seguimento dos cumes: 100 Cims, 3000 do Pirineo, teitos comarcais e 4000 dos Alpes",
+ "lang": "gl",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

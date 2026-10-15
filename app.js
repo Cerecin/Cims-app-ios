@@ -2571,7 +2571,6 @@
       '<button class="menu-item" data-m="mexp">Exportar<small>Dropbox, Google Earth, Excel, CSV i còpia de seguretat</small></button>' +
       '<button class="menu-item" data-m="auto">Còpies automàtiques del mòbil<small>Es fan soles en tancar l\'app · ' + (autoBk().length ? autoBk().length + ' guardades' : 'cap encara') + '</small></button>' +
       '<button class="menu-item" data-m="theme">Aparença: ' + themeName() + '<small>Automàtic (segueix el mòbil), clar o fosc. Toca per canviar-ho.</small></button>' +
-      (!NATIVE ? '<button class="menu-item" data-m="lang">' + (window.__LANG === 'gl' ? 'Idioma: galego<small>Toca para pasar ao catalán</small>' : 'Idioma: català<small>Toca per canviar a gallec</small>') + '</button>' : '') +
       '<button class="menu-item" data-m="lists">Llistes que fas servir<small>' + LISTS.filter(function (l) { return lsOn(l[0]); }).map(function (l) { return l[1]; }).join(' · ') + '</small></button>' +
       '<button class="menu-item" data-m="zero">Començar de zero<small>Tot sense marcar i sense punts</small></button>' +
       '<button class="menu-item" data-m="ota">Actualitzacions de l\'app<small>' + (curVer ? 'Versió ' + fmtVer(curVer.v) + ' · ' : '') + (!NATIVE ? 'es baixen soles' : ota.repo ? 'des de ' + esc(ota.repo) : 'sense configurar') + '</small></button>' +
@@ -2597,7 +2596,6 @@
         }).catch(function (e) { toast(String(e.message || e)); });
       }
       if (m === 'theme') { var cur = themePref(), nx = cur === 'auto' ? 'light' : cur === 'light' ? 'dark' : 'auto'; setTheme(nx); openMenu(); renderFites && view === 'fites' && renderFites(); renderResum(); }
-      if (m === 'lang' && !NATIVE) { try { localStorage.setItem('cimsLang', window.__LANG === 'gl' ? 'ca' : 'gl'); } catch (e) { } try { flushSave(); } catch (e) { } location.reload(); return; }
       if (m === 'lists') listsSheet();
       if (m === 'arx') { if (inbox.length && !imp.busy) inboxSheet(); else importSheet(); }
       if (m === 'ota') { loadVersion().then(otaSheet); }

@@ -1,7 +1,7 @@
 {
- "v": 86,
+ "v": 87,
  "name": "15/10/2026",
- "notes": "Versió web: interfície en gallec (selector d'idioma al menú). L'app d'Android no canvia. Inclou també tot el de la v0.61 a v0.85.",
+ "notes": "Versió web només en gallec. L'app d'Android no canvia. Inclou també tot el de la v0.61 a v0.86.",
  "files": [
   {
    "p": "alps.js",
@@ -10,8 +10,8 @@
   },
   {
    "p": "app.js",
-   "s": "f1c71f8bc1117cb0e91c3a40e70ce88423ff69b4c853d6f6809e962afa473701",
-   "n": 299607
+   "s": "84ab75d8d1c88e1aeb796d88ceb862fef035525b1f1f217744ef05625cab8b8a",
+   "n": 299182
   },
   {
    "p": "comarques.js",
@@ -45,8 +45,8 @@
   },
   {
    "p": "index.html",
-   "s": "6b68315804a9a5502e6fe7a9e8a59d8f7f6fd30e71e361dc20cb353608b65214",
-   "n": 6857
+   "s": "ee7a9b1681f31d6b738576bf38cc10bacdd64d800f08549dde090da02cecdc0a",
+   "n": 6818
   },
   {
    "p": "kmz.js",
@@ -110,8 +110,8 @@
   },
   {
    "p": "manifest.webmanifest",
-   "s": "141bc22e5bdd7dd4a9f83fb585318230562ab45a08dcfaa7e4fc3e0179176658",
-   "n": 663
+   "s": "f0e81df5d17ffec0c6234f87ec8e3a6084a66291e0aae012f30f37337dfe750f",
+   "n": 662
   },
   {
    "p": "medals.js",
