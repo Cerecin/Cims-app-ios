@@ -1,7 +1,7 @@
 {
- "v": 87,
+ "v": 88,
  "name": "15/10/2026",
- "notes": "Versió web només en gallec. L'app d'Android no canvia. Inclou també tot el de la v0.61 a v0.86.",
+ "notes": "Versió web: si falta el fitxer en gallec, torna al català en lloc de quedar-se en blanc. L'app d'Android no canvia. Inclou també tot el de la v0.61 a v0.87.",
  "files": [
   {
    "p": "alps.js",
@@ -45,8 +45,8 @@
   },
   {
    "p": "index.html",
-   "s": "ee7a9b1681f31d6b738576bf38cc10bacdd64d800f08549dde090da02cecdc0a",
-   "n": 6818
+   "s": "c1b53ea96ca5eef7f5797b13d8a87c3eb3fa53943fcff8721de3b9f8eda5beec",
+   "n": 7485
   },
   {
    "p": "kmz.js",

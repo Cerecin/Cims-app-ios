@@ -104,15 +104,21 @@
 <script src="xlsx.js"></script>
 <script src="comarques.js"></script>
 <script src="kmz.js"></script>
-<script>document.write('<script src="tracks'+(window.__LANG?'.'+window.__LANG:'')+'.js"><\/script>')</script>
+<script>
+/* tracks.js (o tracks.gl.js a la web en gallec). Si el fitxer en gallec no hi és (publicació incompleta), es torna al català. */
+(function () {
+  if (!window.__LANG) { document.write('<script src="tracks.js"><\/script>'); return; }
+  document.write('<script src="tracks.' + window.__LANG + '.js" onerror="window.__LANG=null;var s=document.createElement(\'script\');s.src=\'tracks.js\';document.head.appendChild(s)"><\/script>');
+})();
+</script>
 <script src="medimg.js"></script>
 <script src="medals.js"></script>
 <script>
 /* Versió web: abans d'arrencar l'app es llegeix l'estat desat a IndexedDB (a l'app d'Android arrenca directament). */
 (function () {
-  if (window.Android || !window.indexedDB) { document.write('<script src="app'+(window.__LANG?'.'+window.__LANG:'')+'.js"><\/script>'); return; }
+  if (window.Android || !window.indexedDB) { document.write('<script src="app' + (window.__LANG ? '.' + window.__LANG : '') + '.js"' + (window.__LANG ? ' onerror="window.__LANG=null;var s=document.createElement(\'script\');s.src=\'app.js\';document.body.appendChild(s)"' : '') + '><\/script>'); return; }
   var done = false;
-  function go() { if (done) return; done = true; var s = document.createElement('script'); s.src = 'app' + (window.__LANG ? '.' + window.__LANG : '') + '.js'; document.body.appendChild(s); }
+  function go() { if (done) return; done = true; var s = document.createElement('script'); s.src = 'app' + (window.__LANG ? '.' + window.__LANG : '') + '.js'; if (window.__LANG) s.onerror = function () { window.__LANG = null; var t = document.createElement('script'); t.src = 'app.js'; document.body.appendChild(t); }; document.body.appendChild(s); }
   setTimeout(function () { if (!done) window.__IDB_UNKNOWN = true; go(); }, 8000);
   try {
     var r = indexedDB.open('cimsState', 1);
