@@ -610,7 +610,7 @@
       ascList(S.done[k]).forEach(function (x) { if (x.d && (!lastBy[c] || x.d > lastBy[c])) lastBy[c] = x.d; });
     });
     Object.keys(lastBy).forEach(function (c) { rec.push([lastBy[c], c]); });
-    S.points.forEach(function (p) { var ds = ptDates(p); if (ds.length && !officialPoint(p)) rec.push([ds[ds.length - 1], 'p:' + p.id]); });
+    S.points.forEach(function (p) { if (officialPoint(p) || (climbGroup(p) && !isOwnCim(p))) return; var ds = ptDates(p); if (ds.length) rec.push([ds[ds.length - 1], 'p:' + p.id]); });
     rec.sort(function (a, b) { return a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0; });
     if (rec.length) {
       h += '<div class="card"><h2>Últimos cumes <button class="h-link" data-diari="1">Diario ›</button></h2><ul class="recent">' + rec.slice(0, 10).map(function (r) {
@@ -1423,6 +1423,8 @@
   // Sortides d'un punt d'escalada/alpinisme/ferrada (p.vs): data, via, grau, tipus, companys, notes i fites
   var VS_TIPUS = ['Via llarga', 'Esportiva / escola', 'Cresta', 'Alpinisme', 'Ferrata', 'Bloc', 'Altres'];
   var VS_ETIQ = ['', 'Fita', 'Progressió', 'Lliçó', 'Retirada'];
+  // punt d'escalada/alpinisme/ferrada marcat com a cim (que no és a cap llista): compta com a cim a «Últims cims» i a les estadístiques
+  function isOwnCim(p) { return !!p.cc && climbGroup(p) && !(p.ck && p.ck.length); }
   function climbGroup(p) { return ['Escalades', 'Alpinisme', 'Ferrades'].indexOf(p.g) >= 0; }
   // on és una sortida: el punt; si no té coordenades, el primer cim de la sortida que en tingui
   function visitLL(p, v) {
@@ -1580,7 +1582,7 @@
       (p.f && fById[p.f] ? '<b>100 Cims</b><span>' + esc(fById[p.f].n) + '</span>' : '') +
       (p.u && uById[p.u] ? '<b>Tresmil</b><span>' + esc(uById[p.u].n) + '</span>' : '') +
       (p.a && aById[p.a] ? '<b>4000</b><span>' + esc(aById[p.a].n) + '</span>' : '') +
-      (p.ck && p.ck.length ? '<b>Cume</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cume</b><span>Amósase no mapa como cume feito</span>' : '') +
+      (p.ck && p.ck.length ? '<b>Cume</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cume</b><span>Marcado como cume</span>' : '') +
       (p.z ? '<b>Zona</b><span>' + esc(p.z) + '</span>' : '') +
       (p.nt ? '<b>Notas</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + '<div class="btns">' +
       '<button class="btn pri" data-act="edit">Editar</button><button class="btn lnk" data-act="ren">Cambiar o nome</button>' +
@@ -1708,7 +1710,7 @@
       '<div class="two"><div class="field"><label>Grupo</label><select id="fG">' + opts + '</select></div>' +
       '<div class="field"><label>Altitude (m)</label><input id="fH" type="number" inputmode="numeric" value="' + esc(v.h == null ? '' : v.h) + '"></div></div>' +
       '<div class="field" id="fCkW"><label>Cume que sobe <small>· opcional</small></label><div id="fCk"></div><input id="fCs" type="search" placeholder="Busca o cume: Aneto, Pedraforca…"><div id="fCr" class="vcr"></div></div>' +
-      '<div class="field" id="fCcW"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fCc" type="checkbox" style="width:auto;margin:0"' + (v.cc ? ' checked' : '') + '> Amosar como cume feito no mapa <small style="font-weight:400;opacity:.7">· só para o mapa; non conta en ningunha lista nin medalla</small></label></div>' +
+      '<div class="field" id="fCcW"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fCc" type="checkbox" style="width:auto;margin:0"' + (v.cc ? ' checked' : '') + '> Marcar como cume <small style="font-weight:400;opacity:.7">· conta como cume nos últimos cumes, nas estatísticas e no mapa; non entra nas listas</small></label></div>' +
       '<div class="field" id="fDW"><label>Data</label><div class="two"><input id="fD" type="date" value="' + esc(v.d || '') + '"><button class="btn" data-act="nodate">Sen data</button></div></div>' +
       '<div class="two"><div class="field"><label>Latitud</label><input id="fLa" type="number" step="any" inputmode="decimal" value="' + esc(v.la == null ? '' : v.la) + '"></div>' +
       '<div class="field"><label>Longitud</label><input id="fLo" type="number" step="any" inputmode="decimal" value="' + esc(v.lo == null ? '' : v.lo) + '"></div></div>' +
@@ -3046,6 +3048,12 @@
       if (!ds.length) { undated++; (out.und = out.und || []).push({ k: canon, n: info.n, h: info.h }); return; }
       out.push({ k: canon, keys: tk.filter(function (kk) { return S.done[kk]; }), n: info.n, h: info.h, ds: ds });
     });
+    S.points.forEach(function (p) {
+      if (!isOwnCim(p)) return;
+      var ds = ptDates(p).filter(function (d) { return /^\d{4}-\d\d-\d\d$/.test(d); });
+      if (!ds.length) { undated++; (out.und = out.und || []).push({ k: 'p:' + p.id, n: p.n, h: p.h }); return; }
+      out.push({ k: 'p:' + p.id, keys: ['p:' + p.id], n: p.n, h: p.h, ds: ds });
+    });
     return { cims: out, undated: undated, und: out.und || [] };
   }
   function statPeriod(p) {
@@ -3165,7 +3173,8 @@
       ['u', '3000 do Pirineo', lsOn('uiaa'), function (k) { return k[0] === 'u'; }],
       ['c', '3000 catalás', lsOn('cat'), function (k) { return !!CATREF[k]; }],
       ['a', '4000 Alps', lsOn('alps'), function (k) { return k[0] === 'a'; }],
-      ['s', 'Teitos comarcais', lsOn('sos'), function (k) { return k[0] === 's'; }]
+      ['s', 'Teitos comarcais', lsOn('sos'), function (k) { return k[0] === 's'; }],
+      ['p', 'Outros cumes (os meus puntos)', true, function (k) { return k[0] === 'p'; }]
     ].filter(function (l) { return l[2]; });
     var inP = cims.map(function (c) { return { c: c, d: c.ds.filter(function (d) { return d >= r.a && d <= r.b; }) }; }).filter(function (x) { return x.d.length; });
     var lrows = L.map(function (l) {
@@ -3220,7 +3229,7 @@
     if (t.id === 'stYr' && t.value) { STP = t.value; renderStats(); }
     else if (t.id === 'stA' || t.id === 'stB') { var a = $('#stA').value, b = $('#stB').value; if (a && b) { STC = { a: a, b: b }; renderStats(); } }
   });
-  $('#v-stats').addEventListener('click', function (e) { var d = e.target.closest('[data-tk]'); if (!d) return; var it = itemByKey(d.dataset.tk); if (it) openItem(it); });
+  $('#v-stats').addEventListener('click', function (e) { var d = e.target.closest('[data-tk]'); if (!d) return; var tk = d.dataset.tk; if (tk.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === tk.slice(2); })[0]; if (pp) openPoint(pp); return; } var it = itemByKey(tk); if (it) openItem(it); });
 
   // ---------- importar tracks ----------
   function simplify(pts, minM) {

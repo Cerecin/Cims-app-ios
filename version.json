@@ -1,7 +1,7 @@
 {
- "v": 89,
+ "v": 90,
  "name": "16/10/2026",
- "notes": "Fusió de la versió web amb l'app d'Android. Casella «Mostrar com a cim fet al mapa» als punts d'escalada.",
+ "notes": "«Marcar com a cim»: els punts d'escalada marcats compten a Últims cims i a les estadístiques.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "93360388c8dd815eee395f049c4bfe8b024260fbc38f56393b5df6f4b18a2aaa",
-   "n": 301581
+   "s": "106e7c193942efdc39b323475906a8562a8244eb450c8919a283a9a79fe7a719",
+   "n": 302454
   },
   {
    "p": "app.js",
-   "s": "1b2bf3d8a11e3b8e82520597501fd4bb5beabda58b75251f83dc3419d25a3b5b",
-   "n": 300564
+   "s": "8831238ac1975e941d53d98eb7a944d1ec0ca00c962b131c7ed6be9864038ee9",
+   "n": 301444
   },
   {
    "p": "comarques.js",
