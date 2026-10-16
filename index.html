@@ -4,16 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2D5A4A">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Cims">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<script>try{var d=document.documentElement;if(!window.Android){d.classList.add('web');if(/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))d.classList.add('ios')}}catch(e){}</script>
 <title>Cims</title>
-<script>/* Versió web: només en gallec (generat per tools/translate.js). A l'app d'Android no hi ha idioma triable. */if(!window.Android)window.__LANG='gl';</script>
 <script>try{var t=localStorage.getItem("cimsTheme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="stylesheet" href="lib/leaflet.css">
 <link rel="stylesheet" href="style.css">
@@ -104,32 +95,9 @@
 <script src="xlsx.js"></script>
 <script src="comarques.js"></script>
 <script src="kmz.js"></script>
-<script>
-/* tracks.js (o tracks.gl.js a la web en gallec). Si el fitxer en gallec no hi és (publicació incompleta), es torna al català. */
-(function () {
-  if (!window.__LANG) { document.write('<script src="tracks.js"><\/script>'); return; }
-  document.write('<script src="tracks.' + window.__LANG + '.js" onerror="window.__LANG=null;var s=document.createElement(\'script\');s.src=\'tracks.js\';document.head.appendChild(s)"><\/script>');
-})();
-</script>
+<script src="tracks.js"></script>
 <script src="medimg.js"></script>
 <script src="medals.js"></script>
-<script>
-/* Versió web: abans d'arrencar l'app es llegeix l'estat desat a IndexedDB (a l'app d'Android arrenca directament). */
-(function () {
-  if (window.Android || !window.indexedDB) { document.write('<script src="app' + (window.__LANG ? '.' + window.__LANG : '') + '.js"' + (window.__LANG ? ' onerror="window.__LANG=null;var s=document.createElement(\'script\');s.src=\'app.js\';document.body.appendChild(s)"' : '') + '><\/script>'); return; }
-  var done = false;
-  function go() { if (done) return; done = true; var s = document.createElement('script'); s.src = 'app' + (window.__LANG ? '.' + window.__LANG : '') + '.js'; if (window.__LANG) s.onerror = function () { window.__LANG = null; var t = document.createElement('script'); t.src = 'app.js'; document.body.appendChild(t); }; document.body.appendChild(s); }
-  setTimeout(function () { if (!done) window.__IDB_UNKNOWN = true; go(); }, 8000);
-  try {
-    var r = indexedDB.open('cimsState', 1);
-    r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
-    r.onsuccess = function () {
-      try { var q = r.result.transaction('kv').objectStore('kv').get('state'); q.onsuccess = function () { window.__IDB_STATE = q.result || null; go(); }; q.onerror = function () { window.__IDB_UNKNOWN = true; go(); }; }
-      catch (e) { window.__IDB_UNKNOWN = true; go(); }
-    };
-    r.onerror = function () { window.__IDB_UNKNOWN = true; go(); };
-  } catch (e) { window.__IDB_UNKNOWN = true; go(); }
-})();
-</script>
+<script src="app.js"></script>
 </body>
 </html>

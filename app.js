@@ -4,30 +4,6 @@
   var D = window.DATA, SEED = window.SEED;
   var KEY = 'cimsState.v1';
   var NATIVE = window.Android || null;
-  var IOS_TOUCH = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
-  // index.html el llegeix abans d'arrencar l'app i el deixa a window.__IDB_STATE.
-  var wsDbP = null, wsWarned = false;
-  function webStateDb() {
-    if (!wsDbP) wsDbP = new Promise(function (res, rej) {
-      if (!window.indexedDB) return rej('no idb');
-      var r = indexedDB.open('cimsState', 1);
-      r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
-      r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); };
-    });
-    return wsDbP;
-  }
-  function webStateSave(raw, lsOk) {
-    if (window.__IDB_UNKNOWN) return;  // no s'ha pogut llegir l'estat desat: no el trepitgem
-    webStateDb().then(function (db) {
-      return new Promise(function (res, rej) {
-        var t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(raw, 'state');
-        t.oncomplete = res; t.onerror = t.onabort = function () { rej(t.error); };
-      });
-    }).catch(function () {
-      if (!lsOk && !wsWarned) { wsWarned = true; toast('No s\'ha pogut desar al navegador. Fes una còpia a mà (⋯ → Exportar)'); }
-    });
-  }
 
   // ---------- helpers ----------
   function $(s, el) { return (el || document).querySelector(s); }
@@ -152,7 +128,6 @@
     var cand = [];
     try { cand.push(localStorage.getItem(KEY)); } catch (e) { }
     if (NATIVE && NATIVE.loadState) { try { cand.push(NATIVE.loadState()); } catch (e) { } }
-    if (!NATIVE && window.__IDB_STATE) cand.push(window.__IDB_STATE);
     var best = null;
     cand.forEach(function (raw) {
       if (!raw) return;
@@ -214,9 +189,7 @@
     var raw = JSON.stringify(S);
     if (NATIVE && NATIVE.saveState) { try { NATIVE.saveState(raw); } catch (e) { } }
     // si ja no hi cap, es treu de localStorage (no pot quedar-hi una versió antiga): el fitxer de l'app és el que mana
-    var lsOk = true;
-    try { localStorage.setItem(KEY, raw); } catch (e) { lsOk = false; try { if ((NATIVE && NATIVE.saveState) || window.indexedDB) localStorage.removeItem(KEY); } catch (e2) { } }
-    if (!NATIVE) webStateSave(raw, lsOk);
+    try { localStorage.setItem(KEY, raw); } catch (e) { try { if (NATIVE && NATIVE.saveState) localStorage.removeItem(KEY); } catch (e2) { } }
     if (window.__cloudSchedule) window.__cloudSchedule();
   }
   // el càlcul es fa a l'instant (migrate/twins) però escriure a disc s'ajorna uns ms perquè el toc no es quedi encallat
@@ -354,7 +327,6 @@
   var nhId = 0, nhCb = {};
   window.__nativeHttpDone = function (id, code, text) { var f = nhCb[id]; delete nhCb[id]; if (f) f(code, text); };
   function ghText(path) {
-    if (!NATIVE) return fetch(path + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (!r.ok) throw r.status; return r.text(); });
     var url = 'https://raw.githubusercontent.com/' + ota.repo + '/' + (ota.br || 'main') + '/' + path + '?t=' + Date.now();
     var h = ota.tok ? { Authorization: 'token ' + ota.tok } : {};
     if (NATIVE && NATIVE.http) return new Promise(function (res, rej) { var id = 'ph' + (++nhId); nhCb[id] = function (c, t) { c === 200 ? res(t) : rej(c); }; NATIVE.http(id, 'GET', url, JSON.stringify(h), ''); });
@@ -363,7 +335,7 @@
   var phBusy = false;
   function phStatus(o) { try { if (o) localStorage.setItem('cimsFotosSt', JSON.stringify(o)); return JSON.parse(localStorage.getItem('cimsFotosSt')) || {}; } catch (e) { return {}; } }
   function phSync(manual, force) {
-    if (phBusy || (NATIVE && !ota.repo)) return; phBusy = true;
+    if (phBusy || !ota.repo) return; phBusy = true;
     if (force) { try { localStorage.removeItem(PH_HASH); } catch (e) { } }
     var have = {}; try { have = JSON.parse(localStorage.getItem(PH_HASH)) || {}; } catch (e) { }
     ghText('fotos/index.json').then(function (t) {
@@ -1579,7 +1551,7 @@
       (p.f && fById[p.f] ? '<b>100 Cims</b><span>' + esc(fById[p.f].n) + '</span>' : '') +
       (p.u && uById[p.u] ? '<b>Tresmil</b><span>' + esc(uById[p.u].n) + '</span>' : '') +
       (p.a && aById[p.a] ? '<b>4000</b><span>' + esc(aById[p.a].n) + '</span>' : '') +
-      (p.ck && p.ck.length ? '<b>Cim</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : '') +
+      (p.ck && p.ck.length ? '<b>Cim</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cim</b><span>Es mostra al mapa com a cim fet</span>' : '') +
       (p.z ? '<b>Zona</b><span>' + esc(p.z) + '</span>' : '') +
       (p.nt ? '<b>Notes</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + '<div class="btns">' +
       '<button class="btn pri" data-act="edit">Editar</button><button class="btn lnk" data-act="ren">Canviar el nom</button>' +
@@ -1707,6 +1679,7 @@
       '<div class="two"><div class="field"><label>Grup</label><select id="fG">' + opts + '</select></div>' +
       '<div class="field"><label>Altitud (m)</label><input id="fH" type="number" inputmode="numeric" value="' + esc(v.h == null ? '' : v.h) + '"></div></div>' +
       '<div class="field" id="fCkW"><label>Cim que puja <small>· opcional</small></label><div id="fCk"></div><input id="fCs" type="search" placeholder="Busca el cim: Aneto, Pedraforca…"><div id="fCr" class="vcr"></div></div>' +
+      '<div class="field" id="fCcW"><label class="cc-l"><input id="fCc" type="checkbox"' + (v.cc ? ' checked' : '') + '> Mostrar com a cim fet al mapa <small>· només per al mapa; no compta a cap llista ni medalla</small></label></div>' +
       '<div class="field" id="fDW"><label>Data</label><div class="two"><input id="fD" type="date" value="' + esc(v.d || '') + '"><button class="btn" data-act="nodate">Sense data</button></div></div>' +
       '<div class="two"><div class="field"><label>Latitud</label><input id="fLa" type="number" step="any" inputmode="decimal" value="' + esc(v.la == null ? '' : v.la) + '"></div>' +
       '<div class="field"><label>Longitud</label><input id="fLo" type="number" step="any" inputmode="decimal" value="' + esc(v.lo == null ? '' : v.lo) + '"></div></div>' +
@@ -1718,6 +1691,7 @@
     var ck = (v.ck || []).slice();
     function ckRender() {
       $('#fCkW').style.display = climbGroup({ g: $('#fG').value }) ? '' : 'none';
+      $('#fCcW').style.display = climbGroup({ g: $('#fG').value }) && !ck.length ? '' : 'none'; // si ja puja un cim de llista, aquest ja surt al mapa
       $('#fDW').style.display = climbGroup({ g: $('#fG').value }) && p && p.vs && p.vs.length ? 'none' : ''; // les dates d'aquests punts són les de les sortides
       $('#fCk').innerHTML = ck.length ? '<div class="vchips">' + ck.map(function (k) { return '<span class="vchip">' + esc(nameOfKey(k)) + '<button type="button" data-act="ckx" data-k="' + esc(k) + '" aria-label="Treure">×</button></span>'; }).join('') + '</div>' : '';
     }
@@ -1729,7 +1703,7 @@
     };
     function read() {
       return { ck: ck.slice(), n: $('#fN').value.trim(), g: $('#fG').value, h: $('#fH').value === '' ? null : +$('#fH').value, d: $('#fD').value,
-        la: $('#fLa').value === '' ? null : +$('#fLa').value, lo: $('#fLo').value === '' ? null : +$('#fLo').value, nt: $('#fNt').value.trim(), z: $('#fZ').value.trim() };
+        la: $('#fLa').value === '' ? null : +$('#fLa').value, lo: $('#fLo').value === '' ? null : +$('#fLo').value, nt: $('#fNt').value.trim(), z: $('#fZ').value.trim(), cc: $('#fCc').checked };
     }
     $('#sheet').onclick = function (e) {
       var b = e.target.closest('[data-act]'); if (!b) return;
@@ -1748,8 +1722,9 @@
         if (!r.z) delete r.z;
         if (!climbGroup(r) || !r.ck.length) delete r.ck;
         else ckCoords(r);
+        if (!r.cc || !climbGroup(r) || r.ck) delete r.cc;
         var tgt = r;
-        if (isNew) { r.id = uid(); S.points.unshift(r); } else { Object.assign(p, r); if (!p.ds) delete p.ds; if (!r.z) delete p.z; if (!r.ck) delete p.ck; tgt = p; }
+        if (isNew) { r.id = uid(); S.points.unshift(r); } else { Object.assign(p, r); if (!p.ds) delete p.ds; if (!r.z) delete p.z; if (!r.ck) delete p.ck; if (!r.cc) delete p.cc; tgt = p; }
         linkPointCims(tgt);
         save(); refreshAll(); checkMedals(false); if (isNew) closeSheet(); else openPoint(p); toast(isNew ? 'Punt afegit' : 'Punt desat');
       }
@@ -1769,7 +1744,7 @@
   function onlyDone() { return ['feec', 'uiaa', 'alps'].filter(lsOn).every(function (k) { return mapOpts[k] === 'fets'; }); }
   function initMap() {
     if (map) return;
-    map = L.map('map', { zoomControl: false, tapHold: IOS_TOUCH, preferCanvas: true, renderer: L.canvas({ tolerance: 14 }) }).setView([42.1, 1.6], 8); window.__cimsMap = map;
+    map = L.map('map', { zoomControl: false, preferCanvas: true, renderer: L.canvas({ tolerance: 14 }) }).setView([42.1, 1.6], 8); window.__cimsMap = map;
     L.control.zoom({ position: 'topleft' }).addTo(map);
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
     base.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
@@ -1834,8 +1809,13 @@
         .bindPopup('<div class="pop-n">' + esc(f.n) + '</div><div class="pop-m">' + fmtAlt(f.h) + ' · ' + (f.e ? 'Essencial' : 'No essencial') + (d ? ' · ✓ Fet' : w ? ' · ★ Vull fer' : '') + '</div><button class="pop-b" data-k="f:' + f.id + '">Detall</button>')
         .addTo(layers.feec);
     });
+    var triOn = lsOn('feec') && (mapOpts.feec === 'tots' || mapOpts.feec === 'fets');
     S.points.forEach(function (p) {
-      if (p.la == null || !pgOn(p.g || 'Altres')) return;
+      if (p.la == null) return;
+      var tri = p.cc && climbGroup(p) && !(p.ck && p.ck.length);
+      if (!(pgOn(p.g || 'Altres') || (tri && triOn))) return;
+      var pop = '<div class="pop-n">' + esc(p.n) + '</div><div class="pop-m">' + esc(p.g || '') + (p.h ? ' · ' + fmtAlt(p.h) : '') + (tri ? ' · Cim fet' : '') + '</div><button class="pop-b" data-p="' + esc(p.id) + '">Detall</button>' + (officialPoint(p) ? '' : ' <button class="pop-b pop-del" data-dp="' + esc(p.id) + '">Esborra</button>');
+      if (tri) { L.circleMarker([p.la, p.lo], { radius: 7, color: '#fff', weight: 1.5, fillColor: '#2F7A4B', fillOpacity: .95 }).bindPopup(pop).addTo(layers.points); return; }
       L.circleMarker([p.la, p.lo], { radius: 5, color: '#fff', weight: 1, fillColor: GCOL[p.g] || '#555', fillOpacity: .9 })
         .bindPopup('<div class="pop-n">' + esc(p.n) + '</div><div class="pop-m">' + esc(p.g || '') + (p.h ? ' · ' + fmtAlt(p.h) : '') + '</div><button class="pop-b" data-p="' + esc(p.id) + '">Detall</button>' + (officialPoint(p) ? '' : ' <button class="pop-b pop-del" data-dp="' + esc(p.id) + '">Esborra</button>'))
         .addTo(layers.points);
@@ -2293,7 +2273,7 @@
     return fetch('version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { curVer = j; return j; }).catch(function () { return null; });
   }
   function otaCheck(manual) {
-    if (!NATIVE || !NATIVE.otaCheck) { webUpdateCheck(manual); return; }
+    if (!NATIVE || !NATIVE.otaCheck) { if (manual) toast('Les actualitzacions només funcionen a l\'app d\'Android'); return; }
     if (!ota.repo) { if (manual) otaSheet(); return; }
     otaManual = !!manual; otaRes = { state: 'checking' }; ota.last = Date.now(); otaSave();
     if (manual) otaSheet();
@@ -2307,62 +2287,7 @@
     else if (otaManual && otaRes.state === 'error') toast('No s\'ha pogut comprovar: ' + (otaRes.msg || ''));
     if (sheetOpen && $('#otaSheet')) otaSheet();
   };
-  // ---- versió web (PWA): el service worker (sw.js) baixa la versió nova i l'app avisa ----
-  var swReg = null, swApplying = false, swLast = 0, webReady = false;
-  function webApply() {
-    if (!swReg || !swReg.waiting) { location.reload(); return; }
-    swApplying = true; flushSave();
-    swReg.waiting.postMessage('skipWaiting');
-  }
-  function webOnReady() {
-    webReady = true;
-    toast('Hi ha una versió nova de l\'app', 'Actualitzar', webApply);
-    if (sheetOpen && $('#otaSheet')) otaSheet();
-  }
-  function webWatch(reg) {
-    swReg = reg;
-    if (reg.waiting && navigator.serviceWorker.controller) webOnReady();
-    reg.addEventListener('updatefound', function () {
-      var w = reg.installing; if (!w) return;
-      w.addEventListener('statechange', function () { if (w.state === 'installed' && navigator.serviceWorker.controller) webOnReady(); });
-    });
-  }
-  function webSWStart() {
-    if (NATIVE || !('serviceWorker' in navigator)) return;
-    navigator.serviceWorker.addEventListener('controllerchange', function () { if (swApplying) location.reload(); });
-    navigator.serviceWorker.register('sw.js').then(webWatch).catch(function () { });
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden && swReg && Date.now() - swLast > 30 * 60 * 1000) { swLast = Date.now(); swReg.update().catch(function () { }); }
-    });
-    if (navigator.storage && navigator.storage.persist) { try { navigator.storage.persist().catch(function () { }); } catch (e) { } }
-  }
-  function webUpdateCheck(manual) {
-    if (!swReg) { if (manual) toast('Ara no es pot comprovar (cal connexió i tenir l\'app instal·lada)'); return; }
-    swLast = Date.now();
-    swReg.update().then(function () {
-      if (swReg.waiting) { if (manual) webOnReady(); }
-      else if (swReg.installing) { if (manual) toast('Baixant la versió nova…'); }
-      else if (manual) toast('L\'app ja està al dia');
-    }).catch(function () { if (manual) toast('No s\'ha pogut comprovar (sense connexió?)'); });
-    if (manual) phSync(true);
-  }
-  function webSheet() {
-    var v = curVer ? 'Versió ' + fmtVer(curVer.v) + (curVer.name ? ' · ' + esc(curVer.name) : '') : '';
-    var p = phStatus();
-    openSheet('<div id="otaSheet"></div><h3>Actualitzacions de l\'app</h3><div class="sub">' + v + '</div>' +
-      (curVer && curVer.notes ? '<div class="detail">' + esc(curVer.notes) + '</div>' : '') +
-      '<div class="detail">' + (webReady ? 'Hi ha una versió nova descarregada.' : 'Les versions noves es baixen soles. S\'apliquen en tornar a obrir l\'app o amb «Actualitzar ara».') + '</div>' +
-      '<div class="detail"><b>Fotos:</b> ' + Object.keys(window.PHK || {}).length + ' cims amb foto' + (p.t ? ' · comprovat ' + fmtStamp(p.t) : '') + (p.err ? '<br>⚠ ' + esc(p.err) : '') + (phBusy ? '<br>Baixant…' : '') + '</div>' +
-      '<div class="btns"><button class="btn pri" data-o="wcheck">Comprovar ara</button>' + (webReady ? '<button class="btn ok" data-o="wapply">Actualitzar ara</button>' : '') + '<button class="btn" data-o="fotos">Tornar a baixar les fotos</button></div>');
-    $('#sheet').onclick = function (e) {
-      var b = e.target.closest('[data-o]'); if (!b) return;
-      if (b.dataset.o === 'wcheck') webUpdateCheck(true);
-      if (b.dataset.o === 'wapply') webApply();
-      if (b.dataset.o === 'fotos') { phSync(true, true); setTimeout(otaSheet, 50); }
-    };
-  }
   function otaSheet() {
-    if (!NATIVE) { webSheet(); return; }
     var st = otaRes ? ({ checking: 'Comprovant…', uptodate: 'Ja tens l\'última versió (al repositori hi ha la ' + (otaRes.v ? fmtVer(otaRes.v) : '?') + ').', updated: 'Versió nova descarregada (' + fmtVer(otaRes.v) + '). Es farà servir quan tornis a obrir l\'app, o ara mateix si reinicies.', bad: otaRes.msg, error: 'Error: ' + (otaRes.msg || '') })[otaRes.state] || '' : '';
     var v = curVer ? 'Versió ' + fmtVer(curVer.v) + (curVer.name ? ' · ' + esc(curVer.name) : '') : '';
     openSheet('<div id="otaSheet"></div><h3>Actualitzacions de l\'app</h3><div class="sub">' + v + '</div>' +
@@ -2395,9 +2320,8 @@
       if (seen && j.v > seen) toast('App actualitzada a la versió ' + fmtVer(j.v) + (j.notes ? ': ' + j.notes : ''));
       try { localStorage.setItem('cimsSeenVersion', j.v); } catch (e) { }
     });
-    if (!NATIVE) setTimeout(webSWStart, 3000);
-    if (NATIVE && ota.auto && ota.repo && Date.now() - (ota.last || 0) > 3600 * 1000) setTimeout(function () { otaCheck(false); }, 6000);
-    else if ((!NATIVE || ota.repo) && (!Object.keys(window.PHK || {}).length || Date.now() - (phStatus().t || 0) > 3600 * 1000)) setTimeout(function () { phSync(false); }, 4000);
+    if (ota.auto && ota.repo && Date.now() - (ota.last || 0) > 3600 * 1000) setTimeout(function () { otaCheck(false); }, 6000);
+    else if (ota.repo && (!Object.keys(window.PHK || {}).length || Date.now() - (phStatus().t || 0) > 3600 * 1000)) setTimeout(function () { phSync(false); }, 4000);
   }
 
   // ---------- llistes que es fan servir ----------
@@ -2417,23 +2341,12 @@
   // ---------- menú / dades ----------
   function saveFile(name, mime, text) {
     if (NATIVE && NATIVE.saveFile) { NATIVE.saveFile(name, mime, text); return; }
-    webSave(name, mime, new Blob([text], { type: mime }));
-  }
-  // al navegador: a l'iPhone s'obre el full de compartir (Desar a Fitxers, AirDrop, Dropbox...); si no, baixada normal
-  function webSave(name, mime, blob) {
-    function dl() { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500); }
-    if (IOS_TOUCH && navigator.canShare && window.File) {
-      try {
-        var f = new File([blob], name, { type: mime });
-        if (navigator.canShare({ files: [f] })) { navigator.share({ files: [f], title: name }).catch(function (e) { if (!e || e.name !== 'AbortError') dl(); }); return; }
-      } catch (e) { }
-    }
-    dl();
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500);
   }
   function b64(bytes) { var s = '', CH = 0x8000; for (var i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH)); return btoa(s); }
   function saveFileBin(name, mime, bytes) {
     if (NATIVE && NATIVE.saveFileB64) { NATIVE.saveFileB64(name, mime, b64(bytes)); return; }
-    webSave(name, mime, new Blob([bytes], { type: mime }));
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], { type: mime })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500);
   }
   function csvDone() {
     var rows = [['Llista', 'Cim', 'Altitud', 'Data', 'Notes', 'Ascensions', 'Dates de les ascensions']];
@@ -2573,7 +2486,7 @@
       '<button class="menu-item" data-m="theme">Aparença: ' + themeName() + '<small>Automàtic (segueix el mòbil), clar o fosc. Toca per canviar-ho.</small></button>' +
       '<button class="menu-item" data-m="lists">Llistes que fas servir<small>' + LISTS.filter(function (l) { return lsOn(l[0]); }).map(function (l) { return l[1]; }).join(' · ') + '</small></button>' +
       '<button class="menu-item" data-m="zero">Començar de zero<small>Tot sense marcar i sense punts</small></button>' +
-      '<button class="menu-item" data-m="ota">Actualitzacions de l\'app<small>' + (curVer ? 'Versió ' + fmtVer(curVer.v) + ' · ' : '') + (!NATIVE ? 'es baixen soles' : ota.repo ? 'des de ' + esc(ota.repo) : 'sense configurar') + '</small></button>' +
+      '<button class="menu-item" data-m="ota">Actualitzacions de l\'app<small>' + (curVer ? 'Versió ' + fmtVer(curVer.v) + ' · ' : '') + (ota.repo ? 'des de ' + esc(ota.repo) : 'sense configurar') + '</small></button>' +
       '<button class="menu-item" data-m="about">Fonts de les llistes</button>');
     $('#sheet').onclick = menuClick; MENU_SHOWN = true;
   }
