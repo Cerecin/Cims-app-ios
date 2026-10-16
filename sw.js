@@ -2,7 +2,7 @@
 // Service worker de la versió web (PWA) de Cims. No s'usa a l'app d'Android.
 // BUILD el substitueix el flux de publicació (publish-web.yml) amb un identificador del contingut,
 // així el navegador veu un sw.js nou cada cop que canvia alguna cosa i baixa la versió nova.
-const BUILD = '556e13770d42';
+const BUILD = 'e308b23cbc8c';
 const CACHE = 'cims-' + BUILD;
 const SCOPE = self.registration.scope;
 const abs = (p) => new URL(p, SCOPE).href;

@@ -1,7 +1,7 @@
 {
- "v": 86,
+ "v": 89,
  "name": "16/10/2026",
- "notes": "Els punts d'escalada marcats com a cim surten com a cercle verd al mapa (no compten a cap llista).",
+ "notes": "Fusió de la versió web amb l'app d'Android. Casella «Mostrar com a cim fet al mapa» als punts d'escalada.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "e28daf587980a7ea8666f0b115f9e711f99991ebf58a2711352e15474de388a4",
-   "n": 295867
+   "s": "93360388c8dd815eee395f049c4bfe8b024260fbc38f56393b5df6f4b18a2aaa",
+   "n": 301581
   },
   {
    "p": "app.js",
-   "s": "425c30a4a146c35c689a0e52bafca3fb5c8d54b7eaf291aade5d5dac014a7dc7",
-   "n": 294864
+   "s": "1b2bf3d8a11e3b8e82520597501fd4bb5beabda58b75251f83dc3419d25a3b5b",
+   "n": 300564
   },
   {
    "p": "comarques.js",
@@ -29,9 +29,29 @@
    "n": 165685
   },
   {
+   "p": "icons/apple-touch-icon.png",
+   "s": "9f31587082c3021858dbcc114076941eca48876fbcd2679a7619bd400b358687",
+   "n": 6023
+  },
+  {
+   "p": "icons/icon-192.png",
+   "s": "7cd577d5ed6ed16aa785673205334231c2aca7b575116df5b1499cef8d23033b",
+   "n": 6376
+  },
+  {
+   "p": "icons/icon-512.png",
+   "s": "7941527df0d568917a710a04378b400e6a9575058e8e26bbafd84d7d1e3e1ebe",
+   "n": 23212
+  },
+  {
+   "p": "icons/icon-maskable-512.png",
+   "s": "7941527df0d568917a710a04378b400e6a9575058e8e26bbafd84d7d1e3e1ebe",
+   "n": 23212
+  },
+  {
    "p": "index.html",
-   "s": "e4bafe802abefa7d95dee704259d937a299cf89252a9c7843a488ca130432841",
-   "n": 4782
+   "s": "c1b53ea96ca5eef7f5797b13d8a87c3eb3fa53943fcff8721de3b9f8eda5beec",
+   "n": 7485
   },
   {
    "p": "kmz.js",
@@ -92,6 +112,11 @@
    "p": "lib/leaflet.js",
    "s": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
    "n": 147552
+  },
+  {
+   "p": "manifest.webmanifest",
+   "s": "f0e81df5d17ffec0c6234f87ec8e3a6084a66291e0aae012f30f37337dfe750f",
+   "n": 662
   },
   {
    "p": "medals.js",
@@ -705,8 +730,13 @@
   },
   {
    "p": "style.css",
-   "s": "91db2d035a8eb99b78fd6bf252e874e2be41617a9a7b4e93d5ae41124c992a9e",
-   "n": 68179
+   "s": "29dd1e4879a001e1711a80355c785982969a115df00e2ca475ed2f59eed3220d",
+   "n": 69071
+  },
+  {
+   "p": "sw.js",
+   "s": "2c58291285f0f48e30b86c8eedcb7265012325b3a4227b5976339913ba7a26be",
+   "n": 3299
   },
   {
    "p": "tracks.gl.js",
