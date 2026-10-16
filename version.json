@@ -1,7 +1,7 @@
 {
- "v": 90,
- "name": "16/10/2026",
- "notes": "«Marcar com a cim»: els punts d'escalada marcats compten a Últims cims i a les estadístiques.",
+ "v": 91,
+ "name": "17/10/2026",
+ "notes": "Intents: sortides a un cim sense arribar a dalt, amb estadístiques i diari.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "106e7c193942efdc39b323475906a8562a8244eb450c8919a283a9a79fe7a719",
-   "n": 302454
+   "s": "bc392365728b0b1140aa32c9b97387be6f98c6afa0e7828709ed1b126c80b95b",
+   "n": 310625
   },
   {
    "p": "app.js",
-   "s": "8831238ac1975e941d53d98eb7a944d1ec0ca00c962b131c7ed6be9864038ee9",
-   "n": 301444
+   "s": "44f1ec3695ccbb54a678147b765928854eac04e397139f6315a1565dc5bbe7b8",
+   "n": 309616
   },
   {
    "p": "comarques.js",
