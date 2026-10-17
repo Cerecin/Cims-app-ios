@@ -6,6 +6,24 @@
   var KEY = 'cimsState.v1';
   var NATIVE = window.Android || null;
   var IOS_TOUCH = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  // Estils extra (fets / intents a les llistes): s'afegeixen des d'aquí perquè style.css no cal tocar-lo
+  (function () {
+    var st = document.createElement('style'); st.id = 'cimsXtra';
+    st.textContent = ':root{--att:#C4443B;--attl:#FBE6E3}' +
+      '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--att:#F0928A;--attl:#3C2427}}' +
+      ':root[data-theme="dark"]{--att:#F0928A;--attl:#3C2427}' +
+      '.row.done{box-shadow:inset 3px 0 0 var(--pine2),var(--sh)}' +
+      '.row.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att),var(--sh)}' +
+      '.row.att:not(.done) .chk{border-color:var(--att)}' +
+      '.xt{color:var(--att)!important;font-weight:700}' +
+      'ul.rl li.done,ul.rl li.att{padding-left:8px}' +
+      'ul.rl li.done{box-shadow:inset 3px 0 0 var(--pine2)}' +
+      'ul.rl li.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}' +
+      'ul.rl li.att:not(.done) .rl-c{border-color:var(--att)}' +
+      '.pg-b .row.cim{box-shadow:inset 3px 0 0 var(--pine2)}' +
+      '.pg-b .row.att{background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}';
+    document.head.appendChild(st);
+  })();
   // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
   // index.html el llegeix abans d'arrencar l'app i el deixa a window.__IDB_STATE.
   var wsDbP = null, wsWarned = false;
@@ -567,8 +585,8 @@
     }
     function cimRows(items) {
       return '<ul class="rl">' + items.map(function (it) {
-        var d = isDone(it.key), na = d ? nAsc(it.key) : 0;
-        return '<li data-ckey="' + esc(it.key) + '"' + (d ? ' class="done"' : '') + '><span class="rl-c">' + (d ? '✓' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') + '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (na > 1 ? ' <b>×' + na + '</b>' : '') + (attCount(it.key) ? ' <small>' + attWord(attCount(it.key)) + '</small>' : '') + '</span></li>';
+        var d = isDone(it.key), na = d ? nAsc(it.key) : 0, nt = attCount(it.key);
+        return '<li data-ckey="' + esc(it.key) + '"' + (d ? ' class="done"' : nt ? ' class="att"' : '') + '><span class="rl-c">' + (d ? '✓' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') + '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (na > 1 ? ' <b>×' + na + '</b>' : '') + (nt ? ' <small class="xt">' + attWord(nt) + '</small>' : '') + '</span></li>';
       }).join('') + '</ul>';
     }
     var byAlt = function (a, b) { return (b.alt || 0) - (a.alt || 0); };
@@ -682,9 +700,9 @@
   function rdRow(it) {
     var d = isDone(it.key), w = isWant(it.key), na = d ? nAsc(it.key) : 0, ld = d ? lastAsc(it.key) : '', sub = '';
     if (d) sub = (ld ? fmtDate(ld) : 'sen data') + (na > 1 ? ' <b>×' + na + '</b>' : '');
-    if (attCount(it.key)) sub += (sub ? ' · ' : '') + attWord(attCount(it.key));
+    if (attCount(it.key)) sub += (sub ? ' · ' : '') + '<span class="xt">' + attWord(attCount(it.key)) + '</span>';
     else if (w) sub = '<span class="rd-w">★ quero facer' + (S.want[it.key].d ? ' · ' + esc(fmtDate(S.want[it.key].d).slice(0, 5)) : '') + '</span>';
-    return '<li data-rdk="' + esc(it.key) + '"' + (d ? ' class="done"' : w ? ' class="want"' : '') + '><span class="rl-c">' + (d ? '✓' : w ? '★' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') +
+    return '<li data-rdk="' + esc(it.key) + '"' + (d ? ' class="done"' : attCount(it.key) ? ' class="att"' : w ? ' class="want"' : '') + '><span class="rl-c">' + (d ? '✓' : w ? '★' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') +
       '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (sub ? '<small>' + sub + '</small>' : '') + '</span></li>';
   }
   function rdList(items) { return '<ul class="rl tall">' + items.map(rdRow).join('') + '</ul>'; }
@@ -950,7 +968,7 @@
     $('#list').innerHTML = items.length ? items.map(function (it) {
       var d = isDone(it.key), w = isWant(it.key), dd = d && S.done[it.key].d, na = d ? nAsc(it.key) : 0, nt = attCount(it.key), wd = w && S.want[it.key].d;
       var tag = d ? (dd ? 'feito ' + fmtDate(dd).slice(0, 6) + fmtDate(dd).slice(8) : 'feito') : w ? (wd ? 'quero facer · ' + fmtDate(wd).slice(0, 5) : 'quero facer') : '';
-      return '<li class="row' + (d ? ' done' : w ? ' want' : '') + '" data-key="' + esc(it.key) + '" data-kind="' + it.kind + '" data-i="' + esc(it.kind === 'sostre' ? it.ref.id : it.kind === 'cat' ? it.ref.n : it.ref.id) + '">' +
+      return '<li class="row' + (d ? ' done' : w ? ' want' : '') + (nt ? ' att' : '') + '" data-key="' + esc(it.key) + '" data-kind="' + it.kind + '" data-i="' + esc(it.kind === 'sostre' ? it.ref.id : it.kind === 'cat' ? it.ref.n : it.ref.id) + '">' +
         '<button class="chk" aria-label="Marcar como feito">' + (w ? '★' : '✓') + '</button><div class="body"><div class="nm">' + esc(it.name) + '</div>' +
         '<div class="meta">' + it.badges.map(function (b) { return '<span class="badge ' + b[1] + '" style="margin:0 4px 0 0">' + esc(b[0]) + '</span>'; }).join('') + esc(it.meta) + '</div></div>' +
         '<div class="alt">' + fmtAlt(it.alt) + (na > 1 ? '<span class="xn">×' + na + '</span>' : '') + (tag ? '<small>' + tag + '</small>' : '') + (nt ? '<small class="xt">' + attWord(nt) + '</small>' : '') + '</div>' +
@@ -1320,9 +1338,10 @@
   function pgSetOpen(o) { try { localStorage.setItem('cimsPuntsOpen', JSON.stringify(o)); } catch (e) { } }
   function pRow(p, col) {
     var sel = SEL && SEL['p:' + p.id];
-    return '<li class="row' + (sel ? ' rsel' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
+    var nta = attCount('p:' + p.id);
+    return '<li class="row' + (sel ? ' rsel' : '') + (isOwnCim(p) ? ' cim' : '') + (nta ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
       '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [p.d ? fmtDate(p.d) : '', p.la == null ? 'sen coordenadas' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
-      '<div class="alt">' + fmtAlt(p.h) + (p.ds && p.ds.length > 1 ? '<span class="xn">×' + p.ds.length + '</span>' : '') + '</div></li>';
+      '<div class="alt">' + fmtAlt(p.h) + (p.ds && p.ds.length > 1 ? '<span class="xn">×' + p.ds.length + '</span>' : '') + (nta ? '<small class="xt">' + attWord(nta) + '</small>' : '') + '</div></li>';
   }
   function rRow(r, i, col, tag) {
     var sel = SEL && SEL['r:' + i];

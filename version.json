@@ -1,7 +1,7 @@
 {
- "v": 91,
+ "v": 92,
  "name": "17/10/2026",
- "notes": "Intents: sortides a un cim sense arribar a dalt, amb estadístiques i diari.",
+ "notes": "Llistes: fets amb barra verda i intents en vermell.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "bc392365728b0b1140aa32c9b97387be6f98c6afa0e7828709ed1b126c80b95b",
-   "n": 310625
+   "s": "90964f0375aea34cf64b3a375ea30714f0c7324bf87083a3bf85e05b1fc016fa",
+   "n": 312077
   },
   {
    "p": "app.js",
-   "s": "44f1ec3695ccbb54a678147b765928854eac04e397139f6315a1565dc5bbe7b8",
-   "n": 309616
+   "s": "9a8458712eb79cf79b7ba43f1a855710e00f6fca0e317542e67af1241d46aae2",
+   "n": 311068
   },
   {
    "p": "comarques.js",
