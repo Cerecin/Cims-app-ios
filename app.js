@@ -25,7 +25,11 @@
       '.asc-btns{display:flex;gap:8px;margin-top:8px}' +
       '.asc-btns .btn{flex:1;margin:0;padding-left:6px;padding-right:6px;font-weight:700;font-size:14px;line-height:1.25}' +
       '.asc-btns .asc-add-ok{background:var(--pinel);color:var(--pine)}' +
-      '.asc-btns .asc-add-att{background:var(--attl);color:var(--att)}';
+      '.asc-btns .asc-add-att{background:var(--attl);color:var(--att)}' +
+      '.att-w .an-view{background:var(--attb);color:var(--head,inherit)}' +
+      '.att-w .an-view .an-ed{color:var(--att)}' +
+      '.att-w .an-add{border-color:var(--attb);color:var(--att)}' +
+      '.att-w .an-btns .btn.ok{background:var(--attb);color:var(--att)}';
     document.head.appendChild(st);
   })();
   // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
@@ -273,10 +277,14 @@
   }
   function attCount(k) { return attGet(k).length; }
   function attWord(n) { return n + (n === 1 ? ' intent' : ' intents'); }
+  function attNoteView(c, i) {
+    return c ? '<button class="an-view" data-act="tnote" data-ti="' + i + '"><span class="an-t">' + esc(c) + '</span><span class="an-ed">Editar</span></button>'
+      : '<button class="an-add" data-act="tnote" data-ti="' + i + '">＋ Afegir nota (amb qui, per què et vas girar…)</button>';
+  }
   function attRow(x, i) {
     return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"><span class="asc-sp"></span>' +
       '<button class="asc-del" data-act="tdel" data-ti="' + i + '" aria-label="Esborrar l\'intent">×</button></div>' +
-      '<div class="asc-note"><input type="text" class="att-c" style="width:100%;box-sizing:border-box" data-tc="' + i + '" value="' + esc(x.c || '') + '" placeholder="Amb qui, per què et vas girar (temps, neu, hora…)" autocomplete="off" autocorrect="off" spellcheck="false"></div>' +
+      '<div class="asc-note" data-tni="' + i + '">' + attNoteView(x.c, i) + '</div>' +
       '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Va ser una ascensió: passar-la a ascensions</button></div>';
   }
   // botons «Afegir una ascensió» (verd) i «Afegir un intent» (vermell), un al costat de l'altre
@@ -304,8 +312,23 @@
   }
   // retorna true si el clic era d'un intent; «redraw» torna a dibuixar la fitxa; «toAsc(x)» converteix l'intent en ascensió
   function attClick(b, k, redraw, toAsc) {
-    var a = b.dataset.act; if (a !== 'tadd' && a !== 'tdel' && a !== 't2a') return false;
+    var a = b.dataset.act; if (!/^(tadd|tdel|t2a|tnote|tnsave|tncancel|tndelnote)$/.test(a)) return false;
     var L = attGet(k).slice(), i = +b.dataset.ti;
+    if (/^tn/.test(a)) {
+      var box = $('#sheet .asc-note[data-tni="' + i + '"]'), cur = L[i]; if (!box || !cur) return true;
+      if (a === 'tnote') {
+        box.innerHTML = '<textarea rows="3" placeholder="Amb qui, per què et vas girar (temps, neu, hora…)">' + esc(cur.c || '') + '</textarea>' +
+          '<div class="an-btns"><button class="btn ok" data-act="tnsave" data-ti="' + i + '">Desar nota</button><button class="btn" data-act="tncancel" data-ti="' + i + '">Cancel·lar</button>' +
+          (cur.c ? '<button class="btn an-x" data-act="tndelnote" data-ti="' + i + '">Esborrar nota</button>' : '') + '</div>';
+        box.querySelector('textarea').focus(); return true;
+      }
+      if (a !== 'tncancel') {
+        var v = a === 'tnsave' ? box.querySelector('textarea').value.trim() : '';
+        cur = Object.assign({}, cur); if (v) cur.c = v; else delete cur.c;
+        L[i] = cur; attPut(k, L); toast(v ? '✓ Nota desada' : 'Nota esborrada');
+      }
+      box.innerHTML = attNoteView(cur.c, i); return true;
+    }
     if (a === 'tadd') { L.push({ d: today() }); attPut(k, L); refreshAll(); redraw(); toast('Intent afegit (avui): canvia la data si cal'); return true; }
     var x = L[i]; if (!x) return true;
     if (a === 'tdel') { if (!confirm('Esborrar l\'intent' + (x.d ? ' del ' + fmtDate(x.d) : '') + '?')) return true; L.splice(i, 1); attPut(k, L); refreshAll(); redraw(); toast('Intent esborrat'); return true; }
@@ -314,9 +337,6 @@
   function attInputs(k) {
     $$('#sheet input[data-ti]').forEach(function (inp) {
       inp.onchange = function () { var L = attGet(k).slice(), i = +inp.dataset.ti; if (!L[i]) return; L[i] = Object.assign({}, L[i], { d: inp.value }); attPut(k, L); refreshAll(); };
-    });
-    $$('#sheet input[data-tc]').forEach(function (inp) {
-      inp.onchange = function () { var L = attGet(k).slice(), i = +inp.dataset.tc; if (!L[i]) return; L[i] = Object.assign({}, L[i], { c: inp.value.trim() }); attPut(k, L); };
     });
   }
   // ascensió normal (sense sortida) a un cim de llista, amb nota opcional
