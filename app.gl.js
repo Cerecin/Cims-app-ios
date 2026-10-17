@@ -9,9 +9,9 @@
   // Estils extra (fets / intents a les llistes): s'afegeixen des d'aquí perquè style.css no cal tocar-lo
   (function () {
     var st = document.createElement('style'); st.id = 'cimsXtra';
-    st.textContent = ':root{--att:#C4443B;--attl:#FBE6E3}' +
-      '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--att:#F0928A;--attl:#3C2427}}' +
-      ':root[data-theme="dark"]{--att:#F0928A;--attl:#3C2427}' +
+    st.textContent = ':root{--att:#C4443B;--attl:#FBE6E3;--attb:#F4CBC6}' +
+      '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--att:#F0928A;--attl:#3C2427;--attb:#5C2F33}}' +
+      ':root[data-theme="dark"]{--att:#F0928A;--attl:#3C2427;--attb:#5C2F33}' +
       '.row.done{box-shadow:inset 3px 0 0 var(--pine2),var(--sh)}' +
       '.row.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att),var(--sh)}' +
       '.row.att:not(.done) .chk{border-color:var(--att)}' +
@@ -21,7 +21,12 @@
       'ul.rl li.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}' +
       'ul.rl li.att:not(.done) .rl-c{border-color:var(--att)}' +
       '.pg-b .row.cim{box-shadow:inset 3px 0 0 var(--pine2)}' +
-      '.pg-b .row.att{background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}';
+      '.pg-b .row.att{background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}' +
+      '.asc-n.att-n{background:var(--attb);color:var(--att)}' +
+      '.asc-btns{display:flex;gap:8px;margin-top:8px}' +
+      '.asc-btns .btn{flex:1;margin:0;padding-left:6px;padding-right:6px;font-weight:700;font-size:14px;line-height:1.25}' +
+      '.asc-btns .asc-add-ok{background:var(--pinel);color:var(--pine)}' +
+      '.asc-btns .asc-add-att{background:var(--attl);color:var(--att)}';
     document.head.appendChild(st);
   })();
   // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
@@ -269,14 +274,34 @@
   }
   function attCount(k) { return attGet(k).length; }
   function attWord(n) { return n + (n === 1 ? ' intento' : ' intentos'); }
+  function attRow(x, i) {
+    return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"><span class="asc-sp"></span>' +
+      '<button class="asc-del" data-act="tdel" data-ti="' + i + '" aria-label="Borrar o intento">×</button></div>' +
+      '<div class="asc-note"><input type="text" class="att-c" style="width:100%;box-sizing:border-box" data-tc="' + i + '" value="' + esc(x.c || '') + '" placeholder="Con quen, por que te deches a volta (tempo, neve, hora…)" autocomplete="off" autocorrect="off" spellcheck="false"></div>' +
+      '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Foi unha ascensión: pasala a ascensións</button></div>';
+  }
+  // botons «Afegir una ascensió» (verd) i «Afegir un intent» (vermell), un al costat de l'altre
+  function ascBtns(ascAct) {
+    return '<div class="asc-btns">' + (ascAct ? '<button class="btn asc-add asc-add-ok" data-act="' + ascAct + '">+ Engadir unha ascensión</button>' : '') + '<button class="btn asc-add asc-add-att" data-act="tadd">+ Engadir un intento</button></div>';
+  }
+  // bloc d'ascensions + intents d'un cim de llista
+  function ascField(done, A, ascRow, k) {
+    var AT = attGet(k), rows = [];
+    if (done) A.forEach(function (x, i) { rows.push({ d: x.d || '', k: 0, html: ascRow(x, i) }); });
+    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i) }); });
+    return '<div class="field">' + (rows.length ? '<label>' + ascLabel(done ? A.length : 0, AT.length, done) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' : '') + ascBtns('aadd') + '</div>';
+  }
+  // ascensions i intents barrejats, per data (sense data al final; a igualtat, primer les ascensions)
+  function mixRows(rows) {
+    return rows.map(function (r, i) { r.o = i; return r; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : a.k - b.k || a.o - b.o; }).map(function (r) { return r.html; }).join('');
+  }
+  function ascLabel(nA, nT, undatedHint) {
+    return (nA ? (nA === 1 ? '1 ascensión' : nA + ' ascensións') : '') + (nA && nT ? ' · ' : '') + (nT ? attWord(nT) : '') + (undatedHint ? ' <small>· data baleira = sen data</small>' : '');
+  }
+  // intents d'un punt d'escalada marcat com a cim (no té llista d'ascensions): bloc a part
   function attBlock(k) {
     var L = attGet(k), n = L.length;
-    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="asc-list">' + L.map(function (x, i) {
-      return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"><span class="asc-sp"></span>' +
-        '<button class="asc-del" data-act="tdel" data-ti="' + i + '" aria-label="Borrar o intento">×</button></div>' +
-        '<div class="asc-note"><input type="text" class="att-c" style="width:100%;box-sizing:border-box" data-tc="' + i + '" value="' + esc(x.c || '') + '" placeholder="Con quen, por que te deches a volta (tempo, neve, hora…)" autocomplete="off" autocorrect="off" spellcheck="false"></div>' +
-        '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Foi unha ascensión: pasala a ascensións</button></div>';
-    }).join('') + '</div>' : '') + '<button class="btn asc-add" data-act="tadd">+ Engadir un intento</button></div>';
+    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="asc-list">' + L.map(attRow).join('') + '</div>' : '') + ascBtns('') + '</div>';
   }
   // retorna true si el clic era d'un intent; «redraw» torna a dibuixar la fitxa; «toAsc(x)» converteix l'intent en ascensió
   function attClick(b, k, redraw, toAsc) {
@@ -1186,13 +1211,7 @@
     var photo = pk ? '<div class="photo ph-load" data-pk="' + esc(pk) + '" data-fb="' + esc(photoF && photoF.img || '') + '"><img alt="" decoding="async"><span>' + (photoF ? 'Foto: FEEC' : 'Foto: Wikipedia / Wikimedia Commons') + '</span></div>'
       : photoF && photoF.img ? '<div class="photo"><img src="' + esc(photoF.img) + '" alt="" decoding="async" fetchpriority="high" onerror="this.parentNode.style.display=\'none\'"><span>Foto: FEEC</span></div>' : '';
     var A = d ? ascList(rec) : [];
-    var h = (SHEET_BACK ? '<button class="sh-back" data-act="back">‹ Volver á lista</button>' : '') + photo + '<h3>' + esc(it.name) + '</h3><div class="sub">' + it.badges.map(function (b) { return '<span class="badge ' + b[1] + '" style="margin:0 4px 0 0">' + esc(b[0]) + '</span>'; }).join('') + '</div>' +
-      '<div class="kv">' + kv + '</div>' +
-      '<div class="tri"><button data-act="st-pend" class="' + (!d && !isWant(it.key) ? 'on n' : '') + '">Pendente</button><button data-act="st-vull" class="' + (isWant(it.key) ? 'on w' : '') + '">★ Quero facer</button><button data-act="st-fet" class="' + (d ? 'on f' : '') + '">✓ Feito</button></div>' +
-      (!d ? '<button class="lnk-s" data-act="nodate">Marcar como feito, sen data</button>' : '') +
-      (isWant(it.key) ? '<div class="field"><label>Data prevista <small>· opcional</small></label><input type="date" id="wDate" value="' + esc((S.want[it.key] || {}).d || '') + '"></div>' : '') +
-      (d ? '<div class="field"><label>' + (A.length === 1 ? '1 ascensión' : A.length + ' ascensións') + (attCount(it.key) ? ' · ' + attWord(attCount(it.key)) : '') + ' <small>· data baleira = sen data</small></label><div class="asc-list">' +
-          A.map(function (x, i) {
+    var ascRow = function (x, i) {
             var lv = x.vid && visitOf(x.vid), lr = !lv && x.vid && routeOf(x.vid);
             return '<div class="asc-w"><div class="asc"><span class="asc-n">' + (i + 1) + '</span><input type="date" data-ai="' + i + '" value="' + esc(x.d || '') + '"' + (lv ? ' disabled title="A data vén da saída"' : lr ? ' disabled title="A data vén da ruta"' : '') + '>' +
               '<span class="asc-sp"></span><button class="asc-del" data-act="adel" data-ai="' + i + '" aria-label="Borrar a ascensión">×</button></div>' +
@@ -1200,9 +1219,14 @@
               (lr ? '<button class="asc-via" data-act="gotort" data-rid="' + S.routes.indexOf(lr) + '">↳ ' + esc(lr.n) + (lr.t ? ' · ' + esc(lr.t) : '') + ' <small>Ver a ruta ›</small></button>' : '') +
               '<div class="asc-note" data-ni="' + i + '">' + ascNoteView(x.c, i) + '</div>' +
               (!lv && !lr ? '<button class="lnk-s" data-act="a2t" data-ai="' + i + '">Non cheguei ao cume: pasala a intentos</button>' : '') + '</div>';
-          }).join('') + '</div><button class="btn asc-add" data-act="aadd">+ Engadir unha ascensión</button></div>' +
-        '<div class="field"><label>Notas</label><textarea id="dNote" placeholder="Notas sobre o cume">' + esc(rec.nt || '') + '</textarea></div>' : '') +
-      attBlock(it.key) +
+          };
+    var h = (SHEET_BACK ? '<button class="sh-back" data-act="back">‹ Volver á lista</button>' : '') + photo + '<h3>' + esc(it.name) + '</h3><div class="sub">' + it.badges.map(function (b) { return '<span class="badge ' + b[1] + '" style="margin:0 4px 0 0">' + esc(b[0]) + '</span>'; }).join('') + '</div>' +
+      '<div class="kv">' + kv + '</div>' +
+      '<div class="tri"><button data-act="st-pend" class="' + (!d && !isWant(it.key) ? 'on n' : '') + '">Pendente</button><button data-act="st-vull" class="' + (isWant(it.key) ? 'on w' : '') + '">★ Quero facer</button><button data-act="st-fet" class="' + (d ? 'on f' : '') + '">✓ Feito</button></div>' +
+      (!d ? '<button class="lnk-s" data-act="nodate">Marcar como feito, sen data</button>' : '') +
+      (isWant(it.key) ? '<div class="field"><label>Data prevista <small>· opcional</small></label><input type="date" id="wDate" value="' + esc((S.want[it.key] || {}).d || '') + '"></div>' : '') +
+      ascField(d, A, ascRow, it.key) +
+      (d ? '<div class="field"><label>Notas</label><textarea id="dNote" placeholder="Notas sobre o cume">' + esc(rec.nt || '') + '</textarea></div>' : '') +
       '<div class="btns">' + links + '</div>';
     openSheet(h); phHydrate(); attInputs(it.key);
     var sh = $('#sheet');
@@ -1227,6 +1251,7 @@
         setWant(it.key, true); refreshAll(); openItem(it); toast('★ Quero facer');
       }
       if (b.dataset.act === 'nodate') { setDone(it.key, true, ''); openItem(it); toast('Marcado como feito, sen data'); }
+      if (b.dataset.act === 'aadd' && !S.done[it.key]) { addPlainAscent(it.key, today(), ''); save(); refreshAll(); checkMedals(false); openItem(it); toast('Ascensión engadida (hoxe): cambia a data se fai falta'); return; }
       if (b.dataset.act === 'aadd') { var r0 = S.done[it.key]; r0.a = ascList(r0).slice(); r0.a.push({ d: today(), s: 'm' }); sortAsc(r0.a); syncFirst(r0); save(); refreshAll(); openItem(it); toast('Ascensión engadida (hoxe): cambia a data se fai falta'); }
       if (/^(anote|asave|acancel|adelnote)$/.test(b.dataset.act)) {
         var ni = +b.dataset.ai, box = $('#sheet .asc-note[data-ni="' + ni + '"]'), rr = S.done[it.key], cur = ascList(rr)[ni] || {};
@@ -1639,8 +1664,9 @@
     if (climbGroup(p)) return '';
     var D = ptAscDates(p), own = ptOwn(p), ac = p.ac || {}, iv = {};
     ptIncl(p).forEach(function (x) { if (x.v.d) iv[x.v.d] = x; });
-    // mateix aspecte que les ascensions dels cims de les llistes
-    return '<div class="field pasc"><label>' + (D.length === 1 ? '1 ascensión' : D.length + ' ascensións') + ' <small>· data baleira = sen data</small></label><div class="asc-list">' + D.map(function (d, i) {
+    // mateix aspecte que les ascensions dels cims de les llistes; els intents hi van barrejats per data
+    var AT = attGet('p:' + p.id), rows = [];
+    D.forEach(function (d, i) { rows.push({ d: /^\d{4}-\d\d-\d\d$/.test(d) ? d : '', k: 0, html: (function (d, i) {
       var lv = iv[d];
       return '<div class="asc-w"><div class="asc"><span class="asc-n">' + (i + 1) + '</span>' +
         (/^\d{4}-\d\d-\d\d$/.test(d) ? '<input type="date" data-pdi="' + i + '" value="' + esc(d) + '"' + (lv ? ' disabled title="A data vén da saída"' : '') + '>' : '<span class="pasc-d">' + esc(d) + '</span>') +
@@ -1649,7 +1675,9 @@
         '<div class="asc-note" data-pni="' + i + '">' + (ac[d] ? '<button class="an-view" data-act="pnote" data-pi="' + i + '"><span class="an-t">' + esc(ac[d]) + '</span><span class="an-ed">Editar</span></button>'
           : '<button class="an-add" data-act="pnote" data-pi="' + i + '">＋ Engadir nota (con quen, como foi…)</button>') + '</div>' +
         (own.indexOf(d) >= 0 && !lv ? '<button class="lnk-s" data-act="p2t" data-pi="' + i + '">Non cheguei ao cume: pasala a intentos</button>' : '') + '</div>';
-    }).join('') + '</div><button class="btn asc-add" data-act="padd">+ Engadir unha ascensión</button></div>';
+    })(d, i) }); });
+    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i) }); });
+    return '<div class="field pasc"><label>' + ascLabel(D.length, AT.length, true) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' + ascBtns('padd') + '</div>';
   }
   function openPoint(p) {
     setTimeout(function () {
@@ -1670,7 +1698,7 @@
       (p.a && aById[p.a] ? '<b>4000</b><span>' + esc(aById[p.a].n) + '</span>' : '') +
       (p.ck && p.ck.length ? '<b>Cume</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cume</b><span>Marcado como cume</span>' : '') +
       (p.z ? '<b>Zona</b><span>' + esc(p.z) + '</span>' : '') +
-      (p.nt ? '<b>Notas</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + (!climbGroup(p) || isOwnCim(p) ? attBlock('p:' + p.id) : '') + '<div class="btns">' +
+      (p.nt ? '<b>Notas</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + (climbGroup(p) && isOwnCim(p) ? attBlock('p:' + p.id) : '') + '<div class="btns">' +
       '<button class="btn pri" data-act="edit">Editar</button><button class="btn lnk" data-act="ren">Cambiar o nome</button>' +
       (p.la != null ? '<button class="btn lnk" data-act="map">Ver no mapa</button><a class="btn lnk" target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + p.la + ',' + p.lo + '">Google Maps ↗</a>' : '') +
       '<button class="btn warn" data-act="del">Borrar</button></div>';

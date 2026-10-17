@@ -1,7 +1,7 @@
 {
- "v": 92,
+ "v": 93,
  "name": "17/10/2026",
- "notes": "Llistes: fets amb barra verda i intents en vermell.",
+ "notes": "Intents dins la llista d'ascensions, amb punt vermell i botons verd/vermell.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "90964f0375aea34cf64b3a375ea30714f0c7324bf87083a3bf85e05b1fc016fa",
-   "n": 312077
+   "s": "0c1bc7106e5f6433d13c7e07c6246930dacaed8f277fe0fad5cbe53b89cb1d18",
+   "n": 314138
   },
   {
    "p": "app.js",
-   "s": "9a8458712eb79cf79b7ba43f1a855710e00f6fca0e317542e67af1241d46aae2",
-   "n": 311068
+   "s": "3dfe8aed5abadb816d087b44a79ac4b3e2fcbb3dd22272215ef857ee1cd6506a",
+   "n": 313127
   },
   {
    "p": "comarques.js",
