@@ -1404,7 +1404,7 @@
   function pRow(p, col) {
     var sel = SEL && SEL['p:' + p.id];
     var nta = attCount('p:' + p.id);
-    return '<li class="row' + (sel ? ' rsel' : '') + (isOwnCim(p) ? ' cim' : '') + (nta ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
+    return '<li class="row' + (sel ? ' rsel' : '') + ((isOwnCim(p) || (climbGroup(p) && p.ck && p.ck.length)) ? ' cim' : '') + ((nta || isOwnAtt(p)) ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
       '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [p.d ? fmtDate(p.d) : '', p.la == null ? 'sense coordenades' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
       '<div class="alt">' + fmtAlt(p.h) + (p.ds && p.ds.length > 1 ? '<span class="xn">×' + p.ds.length + '</span>' : '') + (nta ? '<small class="xt">' + attWord(nta) + '</small>' : '') + '</div></li>';
   }
@@ -1574,6 +1574,7 @@
   var VS_TIPUS = ['Via llarga', 'Esportiva / escola', 'Cresta', 'Alpinisme', 'Ferrata', 'Bloc', 'Altres'];
   var VS_ETIQ = ['', 'Fita', 'Progressió', 'Lliçó', 'Retirada'];
   // punt d'escalada/alpinisme/ferrada marcat com a cim (que no és a cap llista): compta com a cim a «Últims cims» i a les estadístiques
+  function isOwnAtt(p) { return !!p.ci && climbGroup(p) && !p.cc && !(p.ck && p.ck.length); }
   function isOwnCim(p) { return !!p.cc && climbGroup(p) && !(p.ck && p.ck.length); }
   function climbGroup(p) { return ['Escalades', 'Alpinisme', 'Ferrades'].indexOf(p.g) >= 0; }
   // on és una sortida: el punt; si no té coordenades, el primer cim de la sortida que en tingui
@@ -1749,9 +1750,9 @@
       (p.f && fById[p.f] ? '<b>100 Cims</b><span>' + esc(fById[p.f].n) + '</span>' : '') +
       (p.u && uById[p.u] ? '<b>Tresmil</b><span>' + esc(uById[p.u].n) + '</span>' : '') +
       (p.a && aById[p.a] ? '<b>4000</b><span>' + esc(aById[p.a].n) + '</span>' : '') +
-      (p.ck && p.ck.length ? '<b>Cim</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cim</b><span>Marcat com a cim</span>' : '') +
+      (p.ck && p.ck.length ? '<b>Cim</b><span>' + p.ck.map(function (k) { return esc(nameOfKey(k)); }).join(', ') + '</span>' : p.cc ? '<b>Cim</b><span>Marcat com a cim</span>' : p.ci ? '<b>Cim</b><span>Marcat com a intent de cim</span>' : '') +
       (p.z ? '<b>Zona</b><span>' + esc(p.z) + '</span>' : '') +
-      (p.nt ? '<b>Notes</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + (climbGroup(p) && isOwnCim(p) ? attBlock('p:' + p.id) : '') + '<div class="btns">' +
+      (p.nt ? '<b>Notes</b><span>' + esc(p.nt) + '</span>' : '') + '</div>' + ptAscHtml(p) + vsHtml(p) + plainAscHtml(p) + (climbGroup(p) && (isOwnCim(p) || isOwnAtt(p)) ? attBlock('p:' + p.id) : '') + '<div class="btns">' +
       '<button class="btn pri" data-act="edit">Editar</button><button class="btn lnk" data-act="ren">Canviar el nom</button>' +
       (p.la != null ? '<button class="btn lnk" data-act="map">Veure al mapa</button><a class="btn lnk" target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + p.la + ',' + p.lo + '">Google Maps ↗</a>' : '') +
       '<button class="btn warn" data-act="del">Esborrar</button></div>';
@@ -1888,6 +1889,7 @@
       '<div class="field"><label>Altitud (m)</label><input id="fH" type="number" inputmode="numeric" value="' + esc(v.h == null ? '' : v.h) + '"></div></div>' +
       '<div class="field" id="fCkW"><label>Cim que puja <small>· opcional</small></label><div id="fCk"></div><input id="fCs" type="search" placeholder="Busca el cim: Aneto, Pedraforca…"><div id="fCr" class="vcr"></div></div>' +
       '<div class="field" id="fCcW"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fCc" type="checkbox" style="width:auto;margin:0"' + (v.cc ? ' checked' : '') + '> Marcar com a cim <small style="font-weight:400;opacity:.7">· compta com a cim als últims cims, a les estadístiques i al mapa; no entra a les llistes</small></label></div>' +
+      '<div class="field" id="fCiW"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fCi" type="checkbox" style="width:auto;margin:0"' + (v.ci ? ' checked' : '') + '> Marcar com a intent de cim <small style="font-weight:400;opacity:.7">· no es va arribar a dalt; compta als intents i surt al mapa en vermell</small></label></div>' +
       '<div class="field" id="fDW"><label>Data</label><div class="two"><input id="fD" type="date" value="' + esc(v.d || '') + '"><button class="btn" data-act="nodate">Sense data</button></div></div>' +
       '<div class="two"><div class="field"><label>Latitud</label><input id="fLa" type="number" step="any" inputmode="decimal" value="' + esc(v.la == null ? '' : v.la) + '"></div>' +
       '<div class="field"><label>Longitud</label><input id="fLo" type="number" step="any" inputmode="decimal" value="' + esc(v.lo == null ? '' : v.lo) + '"></div></div>' +
@@ -1899,11 +1901,13 @@
     var ck = (v.ck || []).slice();
     function ckRender() {
       $('#fCkW').style.display = climbGroup({ g: $('#fG').value }) ? '' : 'none';
-      $('#fCcW').style.display = climbGroup({ g: $('#fG').value }) && !ck.length ? '' : 'none'; // si ja puja un cim de llista, aquest ja surt al mapa
+      var cg = climbGroup({ g: $('#fG').value }) && !ck.length; // si ja puja un cim de llista, aquest ja surt al mapa
+      $('#fCcW').style.display = cg && !$('#fCi').checked ? '' : 'none';
+      $('#fCiW').style.display = cg && !$('#fCc').checked ? '' : 'none';
       $('#fDW').style.display = climbGroup({ g: $('#fG').value }) && p && p.vs && p.vs.length ? 'none' : ''; // les dates d'aquests punts són les de les sortides
       $('#fCk').innerHTML = ck.length ? '<div class="vchips">' + ck.map(function (k) { return '<span class="vchip">' + esc(nameOfKey(k)) + '<button type="button" data-act="ckx" data-k="' + esc(k) + '" aria-label="Treure">×</button></span>'; }).join('') + '</div>' : '';
     }
-    ckRender();
+    ckRender(); $('#fCc').onchange = $('#fCi').onchange = ckRender;
     $('#fG').onchange = ckRender;
     $('#fCs').oninput = function () {
       var L = cimSearch(this.value, 8, p && p.id).filter(function (x) { return ck.every(function (c) { return twinKeys(c).indexOf(x.k) < 0; }); });
@@ -1911,7 +1915,7 @@
     };
     function read() {
       return { ck: ck.slice(), n: $('#fN').value.trim(), g: $('#fG').value, h: $('#fH').value === '' ? null : +$('#fH').value, d: $('#fD').value,
-        la: $('#fLa').value === '' ? null : +$('#fLa').value, lo: $('#fLo').value === '' ? null : +$('#fLo').value, nt: $('#fNt').value.trim(), z: $('#fZ').value.trim(), cc: $('#fCc').checked };
+        la: $('#fLa').value === '' ? null : +$('#fLa').value, lo: $('#fLo').value === '' ? null : +$('#fLo').value, nt: $('#fNt').value.trim(), z: $('#fZ').value.trim(), cc: $('#fCc').checked && $('#fCcW').style.display !== 'none', ci: $('#fCi').checked && $('#fCiW').style.display !== 'none' };
     }
     $('#sheet').onclick = function (e) {
       var b = e.target.closest('[data-act]'); if (!b) return;
@@ -1931,9 +1935,11 @@
         if (!climbGroup(r) || !r.ck.length) delete r.ck;
         else ckCoords(r);
         if (!r.cc || !climbGroup(r) || r.ck) delete r.cc;
+        if (!r.ci || !climbGroup(r) || r.ck || r.cc) delete r.ci;
         var tgt = r;
-        if (isNew) { r.id = uid(); S.points.unshift(r); } else { Object.assign(p, r); if (!p.ds) delete p.ds; if (!r.z) delete p.z; if (!r.ck) delete p.ck; if (!r.cc) delete p.cc; tgt = p; }
+        if (isNew) { r.id = uid(); S.points.unshift(r); } else { Object.assign(p, r); if (!p.ds) delete p.ds; if (!r.z) delete p.z; if (!r.ck) delete p.ck; if (!r.cc) delete p.cc; if (!r.ci) delete p.ci; tgt = p; }
         linkPointCims(tgt);
+        if (isOwnAtt(tgt) && !attGet('p:' + tgt.id).length) { var sd = ptDates(tgt).filter(function (d) { return /^\d{4}-\d\d-\d\d$/.test(d); }); if (sd.length) attPut('p:' + tgt.id, sd.map(function (d) { var o = { d: d }, vv = (tgt.vs || []).filter(function (q) { return q.d === d && q.c; })[0], cc2 = (tgt.ac || {})[d] || (vv && vv.c); if (cc2) o.c = cc2; return o; })); }
         save(); refreshAll(); checkMedals(false); if (isNew) closeSheet(); else openPoint(p); toast(isNew ? 'Punt afegit' : 'Punt desat');
       }
     };
@@ -2020,9 +2026,10 @@
     var triOn = lsOn('feec') && (mapOpts.feec === 'tots' || mapOpts.feec === 'fets');
     S.points.forEach(function (p) {
       if (p.la == null) return;
-      var tri = p.cc && climbGroup(p) && !(p.ck && p.ck.length);
-      if (!(pgOn(p.g || 'Altres') || (tri && triOn))) return;
-      var pop = '<div class="pop-n">' + esc(p.n) + '</div><div class="pop-m">' + esc(p.g || '') + (p.h ? ' · ' + fmtAlt(p.h) : '') + (tri ? ' · Cim fet' : '') + '</div><button class="pop-b" data-p="' + esc(p.id) + '">Detall</button>' + (officialPoint(p) ? '' : ' <button class="pop-b pop-del" data-dp="' + esc(p.id) + '">Esborra</button>');
+      var tri = p.cc && climbGroup(p) && !(p.ck && p.ck.length), tai = isOwnAtt(p);
+      if (!(pgOn(p.g || 'Altres') || ((tri || tai) && triOn))) return;
+      var pop = '<div class="pop-n">' + esc(p.n) + '</div><div class="pop-m">' + esc(p.g || '') + (p.h ? ' · ' + fmtAlt(p.h) : '') + (tri ? ' · Cim fet' : '') + (tai ? ' · Intent a cim' : '') + '</div><button class="pop-b" data-p="' + esc(p.id) + '">Detall</button>' + (officialPoint(p) ? '' : ' <button class="pop-b pop-del" data-dp="' + esc(p.id) + '">Esborra</button>');
+      if (tai) { L.circleMarker([p.la, p.lo], { radius: 7, color: '#fff', weight: 1.5, fillColor: '#C4443B', fillOpacity: .95 }).bindPopup(pop).addTo(layers.points); return; }
       if (tri) { L.circleMarker([p.la, p.lo], { radius: 7, color: '#fff', weight: 1.5, fillColor: '#2F7A4B', fillOpacity: .95 }).bindPopup(pop).addTo(layers.points); return; }
       L.circleMarker([p.la, p.lo], { radius: 5, color: '#fff', weight: 1, fillColor: GCOL[p.g] || '#555', fillOpacity: .9 })
         .bindPopup('<div class="pop-n">' + esc(p.n) + '</div><div class="pop-m">' + esc(p.g || '') + (p.h ? ' · ' + fmtAlt(p.h) : '') + '</div><button class="pop-b" data-p="' + esc(p.id) + '">Detall</button>' + (officialPoint(p) ? '' : ' <button class="pop-b pop-del" data-dp="' + esc(p.id) + '">Esborra</button>'))

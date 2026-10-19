@@ -1,7 +1,7 @@
 {
- "v": 95,
+ "v": 96,
  "name": "19/10/2026",
- "notes": "Sortides d'escalada que poden acabar en un intent a un cim.",
+ "notes": "Punts d'escalada marcats com a intent de cim (barra i cercle vermells); barra verda per a tots els que arriben a un cim.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "f9cf3c9b90475250382c02638a34836e475e5d81c5d8728a50642e3df5b174c9",
-   "n": 319218
+   "s": "4c423080109ee10067463e4c902363c93a09f875d03569b55f087c09cfc911b2",
+   "n": 320792
   },
   {
    "p": "app.js",
-   "s": "34555149d66e29a1dfebbb18ff6879b458edde208a284ecdc31ec75d18b372df",
-   "n": 318215
+   "s": "7368a03e08b72b121b5942e5e7370c25dc19e315237020f35af8928487405c81",
+   "n": 319785
   },
   {
    "p": "comarques.js",
