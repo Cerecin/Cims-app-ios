@@ -30,7 +30,11 @@
       '.att-w .an-view{background:var(--attb);color:var(--head,inherit)}' +
       '.att-w .an-view .an-ed{color:var(--att)}' +
       '.att-w .an-add{border-color:var(--attb);color:var(--att)}' +
-      '.att-w .an-btns .btn.ok{background:var(--attb);color:var(--att)}';
+      '.att-w .an-btns .btn.ok{background:var(--attb);color:var(--att)}' +
+      '.vs-at{font-size:12.5px;color:var(--att);font-weight:600;margin-top:3px}' +
+      '.vchip.at{background:var(--attl);border-color:var(--attb);color:var(--att)}' +
+      '.vchip.at button{color:var(--att)}' +
+      '.vchip.add.at{background:none}';
     document.head.appendChild(st);
   })();
   // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
@@ -271,22 +275,37 @@
   function attGet(k) { return (S.att && S.att[attKey(k)]) || []; }
   function attPut(k, l) {
     S.att = S.att || {}; var kk = attKey(k);
-    l = l.map(function (x) { var o = { d: x.d || '' }; if (x.c) o.c = x.c; return o; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : 0; });
+    l = l.map(function (x) { var o = { d: x.d || '' }; if (x.c) o.c = x.c; if (x.vid) { o.vid = x.vid; if (x.pid) o.pid = x.pid; } return o; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : 0; });
     if (l.length) S.att[kk] = l; else delete S.att[kk];
     if (!Object.keys(S.att).length) delete S.att;
     save();
   }
   function attCount(k) { return attGet(k).length; }
+  // intent lligat a una sortida d'escalada (v.at = claus dels cims intentats): la sortida és la font
+  function linkAtt(k, p, v) {
+    var L = attGet(k).map(function (x) { return Object.assign({}, x); }), d = /^\d{4}-\d\d-\d\d$/.test(v.d || '') ? v.d : '';
+    var mine = L.filter(function (x) { return x.vid === v.id; })[0];
+    if (mine) mine.d = d; else { var n = { d: d, pid: p.id, vid: v.id }; if (v.c) n.c = v.c; L.push(n); }
+    attPut(k, L);
+  }
+  function unlinkAtt(k, vid) { attPut(k, attGet(k).filter(function (x) { return x.vid !== vid; })); }
+  function syncVisitAtt(p, v, oldAt) {
+    var nw = v.at || [];
+    (oldAt || []).forEach(function (k) { if (nw.indexOf(k) < 0) unlinkAtt(k, v.id); });
+    nw.forEach(function (k) { linkAtt(k, p, v); });
+  }
   function attWord(n) { return n + (n === 1 ? ' intento' : ' intentos'); }
   function attNoteView(c, i) {
     return c ? '<button class="an-view" data-act="tnote" data-ti="' + i + '"><span class="an-t">' + esc(c) + '</span><span class="an-ed">Editar</span></button>'
       : '<button class="an-add" data-act="tnote" data-ti="' + i + '">＋ Engadir nota (con quen, por que te deches a volta…)</button>';
   }
-  function attRow(x, i) {
-    return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"><span class="asc-sp"></span>' +
+  function attRow(x, i, k) {
+    var lv = x.vid && visitOf(x.vid), go = (k || '').slice(0, 2) === 'p:' ? 'pgovs' : 'gotovs';
+    return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"' + (lv ? ' disabled title="A data vén da saída"' : '') + '><span class="asc-sp"></span>' +
       '<button class="asc-del" data-act="tdel" data-ti="' + i + '" aria-label="Borrar o intento">×</button></div>' +
+      (lv ? '<button class="asc-via" data-act="' + go + '" data-pid="' + esc(lv.p.id) + '">↳ ' + esc([lv.v.v, lv.p.n].filter(function (z, j, ar) { return z && ar.indexOf(z) === j; }).join(' · ')) + (lv.v.gr ? ' · ' + esc(lv.v.gr) : '') + ' <small>Ver a saída ›</small></button>' : '') +
       '<div class="asc-note" data-tni="' + i + '">' + attNoteView(x.c, i) + '</div>' +
-      '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Foi unha ascensión: pasala a ascensións</button></div>';
+      (lv ? '' : '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Foi unha ascensión: pasala a ascensións</button>') + '</div>';
   }
   // botons «Afegir una ascensió» (verd) i «Afegir un intent» (vermell), un al costat de l'altre
   function ascBtns(ascAct) {
@@ -296,7 +315,7 @@
   function ascField(done, A, ascRow, k) {
     var AT = attGet(k), rows = [];
     if (done) A.forEach(function (x, i) { rows.push({ d: x.d || '', k: 0, html: ascRow(x, i) }); });
-    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i) }); });
+    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i, k) }); });
     return '<div class="field">' + (rows.length ? '<label>' + ascLabel(done ? A.length : 0, AT.length, done) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' : '') + ascBtns('aadd') + '</div>';
   }
   // ascensions i intents barrejats, per data (sense data al final; a igualtat, primer les ascensions)
@@ -309,7 +328,7 @@
   // intents d'un punt d'escalada marcat com a cim (no té llista d'ascensions): bloc a part
   function attBlock(k) {
     var L = attGet(k), n = L.length;
-    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="asc-list">' + L.map(attRow).join('') + '</div>' : '') + ascBtns('') + '</div>';
+    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="asc-list">' + L.map(function (x, i) { return attRow(x, i, k); }).join('') + '</div>' : '') + ascBtns('') + '</div>';
   }
   // retorna true si el clic era d'un intent; «redraw» torna a dibuixar la fitxa; «toAsc(x)» converteix l'intent en ascensió
   function attClick(b, k, redraw, toAsc) {
@@ -332,7 +351,9 @@
     }
     if (a === 'tadd') { L.push({ d: today() }); attPut(k, L); refreshAll(); redraw(); toast('Intento engadido (hoxe): cambia a data se fai falta'); return true; }
     var x = L[i]; if (!x) return true;
-    if (a === 'tdel') { if (!confirm('Borrar o intento' + (x.d ? ' do ' + fmtDate(x.d) : '') + '?')) return true; L.splice(i, 1); attPut(k, L); refreshAll(); redraw(); toast('Intento borrado'); return true; }
+    if (a === 'tdel') { if (!confirm('Borrar o intento' + (x.d ? ' do ' + fmtDate(x.d) : '') + (x.vid ? ' (tamén o quita da saída)' : '') + '?')) return true;
+      var lvv = x.vid && visitOf(x.vid); if (lvv && lvv.v.at) { lvv.v.at = lvv.v.at.filter(function (q) { return attKey(q) !== attKey(k); }); if (!lvv.v.at.length) delete lvv.v.at; }
+      L.splice(i, 1); attPut(k, L); refreshAll(); redraw(); toast('Intento borrado'); return true; }
     L.splice(i, 1); attPut(k, L); toAsc(x); save(); refreshAll(); checkMedals(false); redraw(); toast('Passat a ascensió'); return true;
   }
   function attInputs(k) {
@@ -1098,14 +1119,14 @@
     Object.keys(S.att || {}).forEach(function (k) {
       var isP = k.slice(0, 2) === 'p:', p = isP && S.points.filter(function (x) { return x.id === k.slice(2); })[0], inf = !isP && (cimInfo(k) || sosInfo(k) || cimInfo(twinKeys(k)[0]) || sosInfo(twinKeys(k)[0]));
       if (isP ? !p : (!inf || !twinKeys(k).some(listOnFor))) return;
-      S.att[k].forEach(function (x) { if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) add(x.d, { o: 0, a: isP ? 'data-gp="' + esc(p.id) + '"' : 'data-gk="' + esc(k) + '"', n: isP ? p.n : inf.n, m: 'Intento sen chegar ao cume' + ((isP ? p.h : inf.h) ? ' · ' + fmtAlt(isP ? p.h : inf.h) : ''), c: x.c || '' }); });
+      S.att[k].forEach(function (x) { if (x.vid && visitOf(x.vid)) return; if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) add(x.d, { o: 0, a: isP ? 'data-gp="' + esc(p.id) + '"' : 'data-gk="' + esc(k) + '"', n: isP ? p.n : inf.n, m: 'Intento sen chegar ao cume' + ((isP ? p.h : inf.h) ? ' · ' + fmtAlt(isP ? p.h : inf.h) : ''), c: x.c || '' }); });
     });
     S.points.forEach(function (p) {
       if (officialPoint(p)) return;
       var vd = {};
       (p.vs || []).forEach(function (v) {
         if (!/^\d{4}-\d\d-\d\d$/.test(v.d || '')) return; vd[v.d] = 1;
-        add(v.d, { o: 1, a: 'data-gp="' + esc(p.id) + '"', n: v.v || p.n, m: [p.g === 'Escalades' ? 'Escalada' : p.g, p.n !== v.v ? p.n : '', v.gr].filter(Boolean).join(' · ') + (v.cm && v.cm.length ? ' · ⛰ ' + v.cm.map(nameOfKey).join(', ') : ''), c: v.c || '' });
+        add(v.d, { o: 1, a: 'data-gp="' + esc(p.id) + '"', n: v.v || p.n, m: [p.g === 'Escalades' ? 'Escalada' : p.g, p.n !== v.v ? p.n : '', v.gr].filter(Boolean).join(' · ') + (v.cm && v.cm.length ? ' · ⛰ ' + v.cm.map(nameOfKey).join(', ') : '') + (v.at && v.at.length ? ' · ✕ ' + v.at.map(nameOfKey).join(', ') : ''), c: v.c || '' });
       });
       ptDates(p).forEach(function (d) { if (!vd[d]) add(d, { o: 2, a: 'data-gp="' + esc(p.id) + '"', n: p.n, m: (p.g || 'Punto') + (p.h ? ' · ' + fmtAlt(p.h) : ''), c: (p.ac && p.ac[d]) || '' }); });
     });
@@ -1559,7 +1580,7 @@
   // on és una sortida: el punt; si no té coordenades, el primer cim de la sortida que en tingui
   function visitLL(p, v) {
     if (p.la != null && p.la !== '') return { la: +p.la, lo: +p.lo };
-    var c = ((v && v.cm) || []).concat(p.ck || []).map(function (k) { return cimLL(k); }).filter(Boolean)[0];
+    var c = ((v && v.cm) || []).concat((v && v.at) || [], p.ck || []).map(function (k) { return cimLL(k); }).filter(Boolean)[0];
     return c ? { la: c.la, lo: c.lo } : null;
   }
   function vsHtml(p) {
@@ -1572,7 +1593,7 @@
       var t1 = [v.s ? esc(v.s) : '', v.v ? esc(v.v) : '', v.gr ? '<b>' + esc(v.gr) + '</b>' : ''].filter(Boolean).join(' · ') || '—';
       var t2 = [v.t ? esc(v.t) : '', v.c ? esc(v.c) : ''].filter(Boolean).join(' · ');
       return '<div class="vs-i" role="button" tabindex="0" data-act="vsed" data-vi="' + x[1] + '"><div class="vs-h"><span>' + (v.d ? fmtDate(v.d) : '') + '</span><span class="vs-t">' + t1 + '</span></div>' +
-        (t2 ? '<div class="vs-m">' + t2 + '</div>' : '') + (v.cm && v.cm.length ? '<div class="vs-cm">⛰ ' + v.cm.map(function (k) { return esc(nameOfKey(k)); }).join(' · ') + '</div>' : '') + (v.nt ? '<div class="vs-n">' + esc(v.nt) + '</div>' : '') +
+        (t2 ? '<div class="vs-m">' + t2 + '</div>' : '') + (v.cm && v.cm.length ? '<div class="vs-cm">⛰ ' + v.cm.map(function (k) { return esc(nameOfKey(k)); }).join(' · ') + '</div>' : '') + (v.at && v.at.length ? '<div class="vs-at">✕ Intento: ' + v.at.map(function (k) { return esc(nameOfKey(k)); }).join(' · ') + '</div>' : '') + (v.nt ? '<div class="vs-n">' + esc(v.nt) + '</div>' : '') +
         (v.fi || []).map(function (f) { return '<div class="vs-f">★ ' + esc(f) + '</div>'; }).join('') +
         '</div>';
     }).join('') + (V.length ? '' : '<div class="empty">Aínda non hai ningunha saída.</div>') + '</div>' + incH;
@@ -1620,6 +1641,7 @@
       '<div class="field"><label>Tipo</label><select id="vT">' + opt(VS_TIPUS.slice(), v.t) + '</select></div></div>' +
       '<div class="field"><label>Compañeiros</label><input id="vC" value="' + esc(v.c || '') + '" placeholder="Separados por comas"></div>' +
       '<div class="field"><label>Cumes desta saída <small>· contan como ascensión do cume</small></label><div id="vCm"></div><input id="vCs" type="search" autocomplete="off" placeholder="Engadir un cume: escribe o seu nome…"><div id="vCr" class="vcr"></div></div>' +
+      '<div class="field"><label>Cumes intentados <small>· non se chegou ao cume</small></label><div id="vAt"></div><input id="vAs" type="search" autocomplete="off" placeholder="Engadir un cume intentado: escribe o nome…"><div id="vAr" class="vcr"></div></div>' +
       '<div class="field"><label>Notas</label><textarea id="vN" rows="4">' + esc(v.nt || '') + '</textarea></div>' +
       '<div class="btns"><button class="btn pri" data-a="save">Gardar</button><button class="btn" data-a="cancel">Cancelar</button>' + (isNew ? '' : '<button class="btn warn" data-a="del">Borrar</button>') + '</div>';
     openSheet(h);
@@ -1642,8 +1664,17 @@
       $('#vCm').innerHTML = (cm.length ? '<div class="vchips">' + cm.map(function (k) { return '<span class="vchip">' + esc(nameOfKey(k)) + '<button type="button" data-a="cmx" data-k="' + esc(k) + '" aria-label="Quitar">×</button></span>'; }).join('') + '</div>' : '') + ap +
         (sg.length ? '<div class="vsug">Feitos este día: ' + sg.map(function (k) { return '<button type="button" class="vchip add" data-a="cmadd" data-k="' + esc(k) + '">＋ ' + esc(nameOfKey(k)) + '</button>'; }).join('') + '</div>' : '');
     }
-    cmRender();
+    var at = (v.at || []).slice();
+    function atRender() {
+      $('#vAt').innerHTML = at.length ? '<div class="vchips">' + at.map(function (k) { return '<span class="vchip at">✕ ' + esc(nameOfKey(k)) + '<button type="button" data-a="atx" data-k="' + esc(k) + '" aria-label="Quitar">×</button></span>'; }).join('') + '</div>' : '';
+    }
+    function inList(L, k) { return L.some(function (c) { return attKey(c) === attKey(k); }); }
+    cmRender(); atRender();
     $('#vD').onchange = cmRender;
+    $('#vAs').oninput = function () {
+      var L = cimSearch(this.value, 8, p.id).filter(function (x) { return !inList(at, x.k); });
+      $('#vAr').innerHTML = L.map(function (x) { return '<button type="button" data-a="atadd" data-k="' + esc(x.k) + '"><span>' + esc(x.n) + '</span><small>' + esc(x.lab) + (x.h ? ' · ' + fmtAlt(x.h) : '') + '</small></button>'; }).join('');
+    };
     $('#vCs').oninput = function () {
       var L = cimSearch(this.value, 8, p.id).filter(function (x) { return cm.every(function (c) { return twinKeys(c).indexOf(x.k) < 0; }); });
       $('#vCr').innerHTML = L.map(function (x) { return '<button type="button" data-a="cmadd" data-k="' + esc(x.k) + '"><span>' + esc(x.n) + '</span><small>' + esc(x.lab) + (x.h ? ' · ' + fmtAlt(x.h) : '') + '</small></button>'; }).join('');
@@ -1651,13 +1682,15 @@
     $('#sheet').onclick = function (e) {
       var b = e.target.closest('[data-a]'); if (!b) return;
       var a = b.dataset.a;
-      if (a === 'cmadd') { if (cm.indexOf(b.dataset.k) < 0) cm.push(b.dataset.k); $('#vCs').value = ''; $('#vCr').innerHTML = ''; cmRender(); return; }
+      if (a === 'atadd') { var ak = b.dataset.k; if (!inList(at, ak)) at.push(ak); cm = cm.filter(function (c) { return attKey(c) !== attKey(ak); }); $('#vAs').value = ''; $('#vAr').innerHTML = ''; atRender(); cmRender(); return; }
+      if (a === 'atx') { at = at.filter(function (k) { return k !== b.dataset.k; }); atRender(); return; }
+      if (a === 'cmadd') { if (cm.indexOf(b.dataset.k) < 0) cm.push(b.dataset.k); at = at.filter(function (c) { return attKey(c) !== attKey(b.dataset.k); }); atRender(); $('#vCs').value = ''; $('#vCr').innerHTML = ''; cmRender(); return; }
       if (a === 'dpick') { $('#vD').value = b.dataset.d; cmRender(); return; }
       if (a === 'cmx') { cm = cm.filter(function (k) { return k !== b.dataset.k; }); cmRender(); return; }
       if (a === 'cancel') { openPoint(p); return; }
       if (a === 'del') {
         if (!confirm('Queres borrar esta saída?')) return;
-        (p.vs[idx].cm || []).forEach(function (k) { unlinkAsc(k, p.vs[idx].id); });
+        (p.vs[idx].cm || []).forEach(function (k) { unlinkAsc(k, p.vs[idx].id); }); (p.vs[idx].at || []).forEach(function (k) { unlinkAtt(k, p.vs[idx].id); });
         var old = p.vs[idx].d; p.vs.splice(idx, 1); if (!p.vs.length) delete p.vs; vsDates(p, old);
         save(); refreshAll(); openPoint(p); toast('Saída borrada'); return;
       }
@@ -1666,13 +1699,14 @@
         if (!r.d && !r.v) { toast('Pon polo menos a data ou a vía'); return; }
         var n = isNew ? {} : Object.assign({}, v), oldD = isNew ? null : v.d;
         Object.keys(r).forEach(function (k) { if (r[k]) n[k] = r[k]; else delete n[k]; });
-        var oldCm = isNew ? [] : (v.cm || []);
+        var oldCm = isNew ? [] : (v.cm || []), oldAt = isNew ? [] : (v.at || []);
+        if (at.length) { n.at = at.slice(); n.id = n.id || uid(); } else delete n.at;
         if (cm.length) { n.cm = cm.slice(); n.id = n.id || uid(); if (!p.ck || !p.ck.length) p.ck = cm.slice(); ckCoords(p); } else delete n.cm;
         p.vs = p.vs || [];
         if (isNew) p.vs.push(n); else p.vs[idx] = n;
         p.vs.sort(function (x, y) { return (x.d || '') < (y.d || '') ? -1 : (x.d || '') > (y.d || '') ? 1 : 0; });
         vsDates(p, oldD !== r.d ? oldD : null);
-        syncVisit(p, n, oldCm);
+        syncVisit(p, n, oldCm); syncVisitAtt(p, n, oldAt);
         save(); refreshAll(); checkMedals(false); openPoint(p); toast(isNew ? 'Saída engadida' : 'Saída gardada');
       }
     };
@@ -1696,7 +1730,7 @@
           : '<button class="an-add" data-act="pnote" data-pi="' + i + '">＋ Engadir nota (con quen, como foi…)</button>') + '</div>' +
         (own.indexOf(d) >= 0 && !lv ? '<button class="lnk-s" data-act="p2t" data-pi="' + i + '">Non cheguei ao cume: pasala a intentos</button>' : '') + '</div>';
     })(d, i) }); });
-    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i) }); });
+    AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i, 'p:' + p.id) }); });
     return '<div class="field pasc"><label>' + ascLabel(D.length, AT.length, true) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' + ascBtns('padd') + '</div>';
   }
   function openPoint(p) {
