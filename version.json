@@ -1,7 +1,7 @@
 {
- "v": 96,
+ "v": 97,
  "name": "19/10/2026",
- "notes": "Punts d'escalada marcats com a intent de cim (barra i cercle vermells); barra verda per a tots els que arriben a un cim.",
+ "notes": "Estadístiques: compta els sostres comarcals que són d'un cim FEEC i mostra les notes dels intents senceres.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "4c423080109ee10067463e4c902363c93a09f875d03569b55f087c09cfc911b2",
-   "n": 320792
+   "s": "c9b6eeee7c8d2fa7705ce33985aa827b37e1857c579e028a9c1f936fb183384b",
+   "n": 321201
   },
   {
    "p": "app.js",
-   "s": "7368a03e08b72b121b5942e5e7370c25dc19e315237020f35af8928487405c81",
-   "n": 319785
+   "s": "a32156e1296302e37cf56b1f2379b8fb7e74bd684fc73589ebb452afdcba3c9b",
+   "n": 320194
   },
   {
    "p": "comarques.js",

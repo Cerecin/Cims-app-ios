@@ -31,6 +31,8 @@
       '.att-w .an-view .an-ed{color:var(--att)}' +
       '.att-w .an-add{border-color:var(--attb);color:var(--att)}' +
       '.att-w .an-btns .btn.ok{background:var(--attb);color:var(--att)}' +
+      '.st-top .lr.at-r{flex-wrap:wrap;row-gap:3px}' +
+      '.st-top .lr .at-c{flex:0 0 100%;white-space:pre-wrap;word-break:break-word;font-size:12.5px;line-height:1.3;color:var(--mute);background:var(--attl);border-radius:8px;padding:6px 9px}' +
       '.vs-at{font-size:12.5px;color:var(--att);font-weight:600;margin-top:3px}' +
       '.vchip.at{background:var(--attl);border-color:var(--attb);color:var(--att)}' +
       '.vchip.at button{color:var(--att)}' +
@@ -3365,12 +3367,13 @@
     }).join('') + '</div>';
     // per llista
     var CATREF = {}; CAT_VIG.forEach(function (c) { CATREF['u:' + c.ref] = 1; });
+    var SOSK = {}; SOS.forEach(function (x) { SOSK[sosKey(x)] = 1; }); // un sostre que és d'un cim FEEC porta la clau 'f:…'
     var L = [
       ['f', '100 Cims FEEC', lsOn('feec'), function (k) { return k[0] === 'f'; }],
       ['u', '3000 do Pirineo', lsOn('uiaa'), function (k) { return k[0] === 'u'; }],
       ['c', '3000 catalás', lsOn('cat'), function (k) { return !!CATREF[k]; }],
       ['a', '4000 Alps', lsOn('alps'), function (k) { return k[0] === 'a'; }],
-      ['s', 'Teitos comarcais', lsOn('sos'), function (k) { return k[0] === 's'; }],
+      ['s', 'Teitos comarcais', lsOn('sos'), function (k) { return !!SOSK[k]; }],
       ['p', 'Outros cumes (os meus puntos)', true, function (k) { return k[0] === 'p'; }]
     ].filter(function (l) { return l[2]; });
     var inP = cims.map(function (c) { return { c: c, d: c.ds.filter(function (d) { return d >= r.a && d <= r.b; }) }; }).filter(function (x) { return x.d.length; });
@@ -3411,7 +3414,7 @@
       ? [[cims.length, 'con data'], [D.undated, 'sen data'], [AT.list.length + AT.und, 'intentos']]
       : [[cnt.nous, 'cumes novos<br>(1.ª vez)'], [cnt.rep, 'repeticions'], [atIn.length, 'intents' + (Object.keys(atK).length && Object.keys(atK).length !== atIn.length ? '<br>(' + Object.keys(atK).length + ' cims)' : '')]];
     var atH = atIn.length ? '<div class="card st-list st-top"><div class="st-h2">Intentos sen chegar ao cume</div>' + atIn.slice(0, 40).map(function (x) {
-      return '<div class="lr" data-tk="' + esc(x.k) + '"><span class="tn">' + esc(x.n) + '</span><small>' + fmtDate(x.d) + (x.c ? ' · ' + esc(x.c) : '') + '</small></div>';
+      return '<div class="lr at-r" data-tk="' + esc(x.k) + '"><span class="tn">' + esc(x.n) + '</span><small>' + fmtDate(x.d) + '</small>' + (x.c ? '<div class="at-c">' + esc(x.c) + '</div>' : '') + '</div>';
     }).join('') + '</div>' : '';
     var h = '<button class="st-back" data-statsback="1">‹ Atrás</button><div class="st-pe">' + chips.slice(0, 3).map(function (c) { return '<button class="' + (c[0] === STP ? 'on' : '') + '" data-stp="' + c[0] + '">' + esc(c[1]) + '</button>'; }).join('') +
       '<select class="st-yr' + (/^y\d{4}$/.test(STP) ? ' on' : '') + '" id="stYr" aria-label="Ano"><option value=""' + (/^y\d{4}$/.test(STP) ? '' : ' selected') + ' disabled>Ano ▾</option>' + ys.map(function (y) { return '<option value="y' + y + '"' + (STP === 'y' + y ? ' selected' : '') + '>' + y + (y === cy - 1 ? ' (pasado)' : '') + '</option>'; }).join('') + '</select>' +
