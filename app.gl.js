@@ -32,7 +32,14 @@
       '.att-w .an-add{border-color:var(--attb);color:var(--att)}' +
       '.att-w .an-btns .btn.ok{background:var(--attb);color:var(--att)}' +
       '.st-top .lr.at-r{flex-wrap:wrap;row-gap:3px}' +
-      '.st-top .lr .at-c{flex:0 0 100%;white-space:pre-wrap;word-break:break-word;font-size:12.5px;line-height:1.3;color:var(--mute);background:var(--attl);border-radius:8px;padding:6px 9px}' +
+      '.st-top .lr .at-c,.at-all .lr .at-c{flex:0 0 100%;white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.3;color:var(--mute);opacity:.85}' +
+      '.st-top .lr .at-c{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
+      '.at-all .lr{cursor:pointer;flex-wrap:wrap;row-gap:2px;display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}' +
+      '.at-all .lr .tn{flex:1;min-width:0;color:var(--head,inherit);font-size:14px;white-space:normal;line-height:1.25}' +
+      '.at-all .lr small{color:var(--mute);font-size:12px;white-space:nowrap}' +
+      '.at-all .lr .at-w{opacity:.7}' +
+      '.at-more{display:block;margin:10px auto 0;font-weight:600}' +
+      '.att-l{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--att);margin:8px 0 3px}' +
       '.vs-at{font-size:12.5px;color:var(--att);font-weight:600;margin-top:3px}' +
       '.vchip.at{background:var(--attl);border-color:var(--attb);color:var(--att)}' +
       '.vchip.at button{color:var(--att)}' +
@@ -277,7 +284,7 @@
   function attGet(k) { return (S.att && S.att[attKey(k)]) || []; }
   function attPut(k, l) {
     S.att = S.att || {}; var kk = attKey(k);
-    l = l.map(function (x) { var o = { d: x.d || '' }; if (x.c) o.c = x.c; if (x.vid) { o.vid = x.vid; if (x.pid) o.pid = x.pid; } return o; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : 0; });
+    l = l.map(function (x) { var o = { d: x.d || '' }; if (x.c) o.c = x.c; if (x.m) o.m = x.m; if (x.vid) { o.vid = x.vid; if (x.pid) o.pid = x.pid; } return o; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : 0; });
     if (l.length) S.att[kk] = l; else delete S.att[kk];
     if (!Object.keys(S.att).length) delete S.att;
     save();
@@ -297,16 +304,19 @@
     nw.forEach(function (k) { linkAtt(k, p, v); });
   }
   function attWord(n) { return n + (n === 1 ? ' intento' : ' intentos'); }
-  function attNoteView(c, i) {
-    return c ? '<button class="an-view" data-act="tnote" data-ti="' + i + '"><span class="an-t">' + esc(c) + '</span><span class="an-ed">Editar</span></button>'
-      : '<button class="an-add" data-act="tnote" data-ti="' + i + '">＋ Engadir nota (con quen, por que te deches a volta…)</button>';
+  var ATF = { c: ['Con quen', '＋ Con quen foches…', 'Con quen foches…'], m: ['Que pasou', '＋ Que pasou (por que vos deches a volta)…', 'Que pasou? Por que vos deches a volta (tempo, neve, hora, risco…)'] };
+  function attNoteView(t, i, f) {
+    f = f || 'c';
+    return t ? '<button class="an-view" data-act="tnote" data-ti="' + i + '" data-tf="' + f + '"><span class="an-t">' + esc(t) + '</span><span class="an-ed">Editar</span></button>'
+      : '<button class="an-add" data-act="tnote" data-ti="' + i + '" data-tf="' + f + '">' + ATF[f][1] + '</button>';
   }
   function attRow(x, i, k) {
     var lv = x.vid && visitOf(x.vid), go = (k || '').slice(0, 2) === 'p:' ? 'pgovs' : 'gotovs';
     return '<div class="asc-w att-w"><div class="asc"><span class="asc-n att-n">✕</span><input type="date" data-ti="' + i + '" value="' + esc(x.d || '') + '"' + (lv ? ' disabled title="A data vén da saída"' : '') + '><span class="asc-sp"></span>' +
       '<button class="asc-del" data-act="tdel" data-ti="' + i + '" aria-label="Borrar o intento">×</button></div>' +
       (lv ? '<button class="asc-via" data-act="' + go + '" data-pid="' + esc(lv.p.id) + '">↳ ' + esc([lv.v.v, lv.p.n].filter(function (z, j, ar) { return z && ar.indexOf(z) === j; }).join(' · ')) + (lv.v.gr ? ' · ' + esc(lv.v.gr) : '') + ' <small>Ver a saída ›</small></button>' : '') +
-      '<div class="asc-note" data-tni="' + i + '">' + attNoteView(x.c, i) + '</div>' +
+      '<small class="att-l">Con quen</small><div class="asc-note" data-tni="' + i + '" data-tf="c">' + attNoteView(x.c, i, 'c') + '</div>' +
+      '<small class="att-l">Que pasou</small><div class="asc-note" data-tni="' + i + '" data-tf="m">' + attNoteView(x.m, i, 'm') + '</div>' +
       (lv ? '' : '<button class="lnk-s" data-act="t2a" data-ti="' + i + '">Foi unha ascensión: pasala a ascensións</button>') + '</div>';
   }
   // botons «Afegir una ascensió» (verd) i «Afegir un intent» (vermell), un al costat de l'altre
@@ -337,26 +347,26 @@
     var a = b.dataset.act; if (!/^(tadd|tdel|t2a|tnote|tnsave|tncancel|tndelnote)$/.test(a)) return false;
     var L = attGet(k).slice(), i = +b.dataset.ti;
     if (/^tn/.test(a)) {
-      var box = $('#sheet .asc-note[data-tni="' + i + '"]'), cur = L[i]; if (!box || !cur) return true;
+      var f = b.dataset.tf === 'm' ? 'm' : 'c', box = $('#sheet .asc-note[data-tni="' + i + '"][data-tf="' + f + '"]'), cur = L[i]; if (!box || !cur) return true;
       if (a === 'tnote') {
-        box.innerHTML = '<textarea rows="3" placeholder="Con quen, por que te deches a volta (tempo, neve, hora…)">' + esc(cur.c || '') + '</textarea>' +
-          '<div class="an-btns"><button class="btn ok" data-act="tnsave" data-ti="' + i + '">Gardar nota</button><button class="btn" data-act="tncancel" data-ti="' + i + '">Cancelar</button>' +
-          (cur.c ? '<button class="btn an-x" data-act="tndelnote" data-ti="' + i + '">Borrar nota</button>' : '') + '</div>';
+        box.innerHTML = '<textarea rows="3" placeholder="' + ATF[f][2] + '">' + esc(cur[f] || '') + '</textarea>' +
+          '<div class="an-btns"><button class="btn ok" data-act="tnsave" data-ti="' + i + '" data-tf="' + f + '">Gardar nota</button><button class="btn" data-act="tncancel" data-ti="' + i + '" data-tf="' + f + '">Cancelar</button>' +
+          (cur[f] ? '<button class="btn an-x" data-act="tndelnote" data-ti="' + i + '" data-tf="' + f + '">Borrar nota</button>' : '') + '</div>';
         box.querySelector('textarea').focus(); return true;
       }
       if (a !== 'tncancel') {
         var v = a === 'tnsave' ? box.querySelector('textarea').value.trim() : '';
-        cur = Object.assign({}, cur); if (v) cur.c = v; else delete cur.c;
+        cur = Object.assign({}, cur); if (v) cur[f] = v; else delete cur[f];
         L[i] = cur; attPut(k, L); toast(v ? '✓ Nota gardada' : 'Nota borrada');
       }
-      box.innerHTML = attNoteView(cur.c, i); return true;
+      box.innerHTML = attNoteView(cur[f], i, f); return true;
     }
     if (a === 'tadd') { L.push({ d: today() }); attPut(k, L); refreshAll(); redraw(); toast('Intento engadido (hoxe): cambia a data se fai falta'); return true; }
     var x = L[i]; if (!x) return true;
     if (a === 'tdel') { if (!confirm('Borrar o intento' + (x.d ? ' do ' + fmtDate(x.d) : '') + (x.vid ? ' (tamén o quita da saída)' : '') + '?')) return true;
       var lvv = x.vid && visitOf(x.vid); if (lvv && lvv.v.at) { lvv.v.at = lvv.v.at.filter(function (q) { return attKey(q) !== attKey(k); }); if (!lvv.v.at.length) delete lvv.v.at; }
       L.splice(i, 1); attPut(k, L); refreshAll(); redraw(); toast('Intento borrado'); return true; }
-    L.splice(i, 1); attPut(k, L); toAsc(x); save(); refreshAll(); checkMedals(false); redraw(); toast('Passat a ascensió'); return true;
+    L.splice(i, 1); attPut(k, L); toAsc(Object.assign({}, x, { c: [x.c, x.m].filter(Boolean).join(' · ') })); save(); refreshAll(); checkMedals(false); redraw(); toast('Passat a ascensió'); return true;
   }
   function attInputs(k) {
     $$('#sheet input[data-ti]').forEach(function (inp) {
@@ -1121,7 +1131,7 @@
     Object.keys(S.att || {}).forEach(function (k) {
       var isP = k.slice(0, 2) === 'p:', p = isP && S.points.filter(function (x) { return x.id === k.slice(2); })[0], inf = !isP && (cimInfo(k) || sosInfo(k) || cimInfo(twinKeys(k)[0]) || sosInfo(twinKeys(k)[0]));
       if (isP ? !p : (!inf || !twinKeys(k).some(listOnFor))) return;
-      S.att[k].forEach(function (x) { if (x.vid && visitOf(x.vid)) return; if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) add(x.d, { o: 0, a: isP ? 'data-gp="' + esc(p.id) + '"' : 'data-gk="' + esc(k) + '"', n: isP ? p.n : inf.n, m: 'Intento sen chegar ao cume' + ((isP ? p.h : inf.h) ? ' · ' + fmtAlt(isP ? p.h : inf.h) : ''), c: x.c || '' }); });
+      S.att[k].forEach(function (x) { if (x.vid && visitOf(x.vid)) return; if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) add(x.d, { o: 0, a: isP ? 'data-gp="' + esc(p.id) + '"' : 'data-gk="' + esc(k) + '"', n: isP ? p.n : inf.n, m: 'Intento sen chegar ao cume' + ((isP ? p.h : inf.h) ? ' · ' + fmtAlt(isP ? p.h : inf.h) : ''), c: [x.m, x.c].filter(Boolean).join(' · ') }); });
     });
     S.points.forEach(function (p) {
       if (officialPoint(p)) return;
@@ -3245,15 +3255,36 @@
   }
   // intents amb data (i els sense data a part), amb el nom i l'altitud del cim o punt
   function statAtt() {
-    var out = [], und = 0;
+    var out = [], und = 0, undl = [];
     Object.keys(S.att || {}).forEach(function (k) {
       var n, h, kk = k;
       if (k.slice(0, 2) === 'p:') { var p = S.points.filter(function (x) { return x.id === k.slice(2); })[0]; if (!p) return; n = p.n; h = p.h; }
       else { var tk = twinKeys(k); if (!tk.some(listOnFor)) return; var inf = cimInfo(k) || sosInfo(k) || cimInfo(tk[0]) || sosInfo(tk[0]); if (!inf) return; n = inf.n; h = inf.h; }
-      S.att[k].forEach(function (x) { if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) out.push({ k: kk, n: n, h: h, d: x.d, c: x.c || '' }); else und++; });
+      S.att[k].forEach(function (x) { var o = { k: kk, n: n, h: h, d: x.d || '', c: x.c || '', m: x.m || '' }; if (/^\d{4}-\d\d-\d\d$/.test(x.d || '')) out.push(o); else { und++; o.d = ''; undl.push(o); } });
     });
     out.sort(function (a, b) { return a.d < b.d ? 1 : a.d > b.d ? -1 : 0; });
-    return { list: out, und: und };
+    return { list: out, und: und, undl: undl };
+  }
+  // llista completa d'intents (tots els períodes); es toca un intent per obrir el cim
+  function attAllOpen() {
+    var A = statAtt(), all = A.list.concat(A.undl), q = '';
+    var nC = {}; all.forEach(function (x) { nC[x.k] = 1; });
+    function rows() {
+      var t = norm(q), L = all.filter(function (x) { return !t || norm([x.n, x.c, x.m].join(' ')).indexOf(t) >= 0; });
+      return L.length ? L.map(function (x) {
+        return '<div class="lr at-r" data-ak="' + esc(x.k) + '"><span class="tn">' + esc(x.n) + '</span><small>' + (x.d ? fmtDate(x.d) : 'sen data') + '</small>' +
+          (x.m ? '<div class="at-c">' + esc(x.m) + '</div>' : '') + (x.c ? '<div class="at-c at-w">con ' + esc(x.c) + '</div>' : '') + '</div>';
+      }).join('') : '<div class="empty">Ningún intento coincide.</div>';
+    }
+    openSheet('<h3>Intentos sen chegar ao cume</h3><div class="sub">' + all.length + (all.length === 1 ? ' intento' : ' intentos') + ' · ' + Object.keys(nC).length + (Object.keys(nC).length === 1 ? ' cume' : ' cumes') + '. Toca un intento para ver o cume.</div>' +
+      '<div class="field"><input id="atQ" type="search" autocomplete="off" placeholder="Busca: cume, compañeiro, motivo…"></div><div class="at-all" id="atL">' + rows() + '</div>');
+    $('#atQ').oninput = function () { q = this.value; $('#atL').innerHTML = rows(); };
+    $('#sheet').onclick = function (e) {
+      var r = e.target.closest('[data-ak]'); if (!r) return;
+      var k = r.dataset.ak;
+      if (k.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === k.slice(2); })[0]; if (pp) openPoint(pp); return; }
+      var it = itemByKey(k); if (it) { SHEET_BACK = attAllOpen; openItem(it); }
+    };
   }
   function statPeriod(p) {
     var now = new Date(), cy = now.getFullYear(), t = ymd(now), r = { id: p };
@@ -3414,15 +3445,15 @@
       ? [[cims.length, 'con data'], [D.undated, 'sen data'], [AT.list.length + AT.und, 'intentos']]
       : [[cnt.nous, 'cumes novos<br>(1.ª vez)'], [cnt.rep, 'repeticions'], [atIn.length, 'intents' + (Object.keys(atK).length && Object.keys(atK).length !== atIn.length ? '<br>(' + Object.keys(atK).length + ' cims)' : '')]];
     var atH = atIn.length ? '<div class="card st-list st-top"><div class="st-h2">Intentos sen chegar ao cume</div>' + atIn.slice(0, 40).map(function (x) {
-      return '<div class="lr at-r" data-tk="' + esc(x.k) + '"><span class="tn">' + esc(x.n) + '</span><small>' + fmtDate(x.d) + '</small>' + (x.c ? '<div class="at-c">' + esc(x.c) + '</div>' : '') + '</div>';
-    }).join('') + '</div>' : '';
+      return '<div class="lr at-r" data-tk="' + esc(x.k) + '"><span class="tn">' + esc(x.n) + '</span><small>' + fmtDate(x.d) + '</small>' + (x.m || x.c ? '<div class="at-c">' + esc(x.m || 'con ' + x.c) + '</div>' : '') + '</div>';
+    }).join('') + '<button class="lnk-s at-more" data-attall="1">Ver a lista completa (' + (AT.list.length + AT.und) + ') ›</button></div>' : '';
     var h = '<button class="st-back" data-statsback="1">‹ Atrás</button><div class="st-pe">' + chips.slice(0, 3).map(function (c) { return '<button class="' + (c[0] === STP ? 'on' : '') + '" data-stp="' + c[0] + '">' + esc(c[1]) + '</button>'; }).join('') +
       '<select class="st-yr' + (/^y\d{4}$/.test(STP) ? ' on' : '') + '" id="stYr" aria-label="Ano"><option value=""' + (/^y\d{4}$/.test(STP) ? '' : ' selected') + ' disabled>Ano ▾</option>' + ys.map(function (y) { return '<option value="y' + y + '"' + (STP === 'y' + y ? ' selected' : '') + '>' + y + (y === cy - 1 ? ' (pasado)' : '') + '</option>'; }).join('') + '</select>' +
       chips.slice(3).map(function (c) { return '<button class="' + (c[0] === STP ? 'on' : '') + '" data-stp="' + c[0] + '">' + esc(c[1]) + '</button>'; }).join('') + '</div>' +
       (STP === 'custom' ? '<div class="st-cu"><label>Desde<input type="date" id="stA" value="' + esc(r.a) + '"></label><label>Ata<input type="date" id="stB" value="' + esc(r.b) + '"></label></div>' : '') +
       '<div class="card st-hero"><div class="st-lab">' + esc(r.lab) + '</div><div class="st-row"><span class="st-big">' + (r.kind === 'all' ? cims.length + D.undated : cnt.n) + '</span><span class="st-u">cumes</span>' + (cmp ? '<span class="st-cmp">' + esc(cmp) + '</span>' : '') + '</div>' +
       (cnt.n || bk.some(function (b) { return b.n; }) ? chart : '<div class="empty" style="padding:22px 6px 6px">Ningún cume con data neste período.</div>') + '</div>' +
-      '<div class="st-kp">' + kp.map(function (x) { return '<div class="card"><div class="v">' + x[0] + '</div><div class="l">' + x[1] + '</div></div>'; }).join('') + '</div>' +
+      '<div class="st-kp">' + kp.map(function (x) { var at = /^intents/.test(x[1]) && (AT.list.length + AT.und); return '<div class="card"' + (at ? ' data-attall="1" style="cursor:pointer"' : '') + '><div class="v">' + x[0] + '</div><div class="l">' + x[1] + (at ? ' ›' : '') + '</div></div>'; }).join('') + '</div>' +
       (lrows ? '<div class="card st-list"><div class="st-h2">Por lista</div>' + lrows + '</div>' : '') +
       topH + altH + atH +
       (det.length ? '<div class="card st-list"><div class="st-h2">Destacados</div>' + det.map(function (x) { return '<div class="lr">' + x[0] + '<span>' + x[1] + '</span></div>'; }).join('') + '</div>' : '') + climbStatsHtml(r);
@@ -3433,7 +3464,7 @@
     if (t.id === 'stYr' && t.value) { STP = t.value; renderStats(); }
     else if (t.id === 'stA' || t.id === 'stB') { var a = $('#stA').value, b = $('#stB').value; if (a && b) { STC = { a: a, b: b }; renderStats(); } }
   });
-  $('#v-stats').addEventListener('click', function (e) { var d = e.target.closest('[data-tk]'); if (!d) return; var tk = d.dataset.tk; if (tk.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === tk.slice(2); })[0]; if (pp) openPoint(pp); return; } var it = itemByKey(tk); if (it) openItem(it); });
+  $('#v-stats').addEventListener('click', function (e) { if (e.target.closest('[data-attall]')) { attAllOpen(); return; } var d = e.target.closest('[data-tk]'); if (!d) return; var tk = d.dataset.tk; if (tk.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === tk.slice(2); })[0]; if (pp) openPoint(pp); return; } var it = itemByKey(tk); if (it) openItem(it); });
 
   // ---------- importar tracks ----------
   function simplify(pts, minM) {

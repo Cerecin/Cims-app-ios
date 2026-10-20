@@ -1,7 +1,7 @@
 {
- "v": 97,
- "name": "19/10/2026",
- "notes": "Estadístiques: compta els sostres comarcals que són d'un cim FEEC i mostra les notes dels intents senceres.",
+ "v": 98,
+ "name": "20/10/2026",
+ "notes": "Llista completa d'intents, camps «amb qui» i «què va passar», motiu discret a les estadístiques.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "c9b6eeee7c8d2fa7705ce33985aa827b37e1857c579e028a9c1f936fb183384b",
-   "n": 321201
+   "s": "47c99d41ee0a423a66f18d7a4f5e3e17ebedc98ee640cea2df316ed229a69740",
+   "n": 324686
   },
   {
    "p": "app.js",
-   "s": "a32156e1296302e37cf56b1f2379b8fb7e74bd684fc73589ebb452afdcba3c9b",
-   "n": 320194
+   "s": "3614a178a4bc21410ab8546011681fb8e08c19c941086af1cceefeeee8a189e2",
+   "n": 323699
   },
   {
    "p": "comarques.js",
