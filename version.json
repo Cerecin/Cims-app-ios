@@ -1,7 +1,7 @@
 {
- "v": 102,
+ "v": 103,
  "name": "23/10/2026",
- "notes": "Marcar una sortida com a intent al mateix punt; data i recompte a la llista de punts.",
+ "notes": "Intents com a ×N en vermell a les llistes, igual que les ascensions en verd.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "277e9f4125210a3d65d574dc3b8fc7ecb02fd241cf7b3393e99d604833e06823",
-   "n": 341841
+   "s": "3b30ab3ba9a83637376b1afe1342c3aa2b2af88ad2080bb20447817bf2b95928",
+   "n": 341818
   },
   {
    "p": "app.js",
-   "s": "3eb01878b243666b7a84ea0dd848d0df19aae2930163f314d64ee3e0461081a6",
-   "n": 340831
+   "s": "fba2067296bc4b2abc035d895e0cb26d72ca7d68270f0002ec4d04d76793f1e5",
+   "n": 340808
   },
   {
    "p": "comarques.js",

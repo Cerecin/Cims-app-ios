@@ -13,15 +13,16 @@
       '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--att:#F0928A;--attl:#3C2427;--attb:#5C2F33}}' +
       ':root[data-theme="dark"]{--att:#F0928A;--attl:#3C2427;--attb:#5C2F33}' +
       '.row.done{box-shadow:inset 3px 0 0 var(--pine2),var(--sh)}' +
-      '.row.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att),var(--sh)}' +
+      '.row.att:not(.done){box-shadow:inset 3px 0 0 var(--att),var(--sh)}' +
       '.row.att:not(.done) .chk{border-color:var(--att)}' +
       '.xt{color:var(--att)!important;font-weight:700}' +
+      '.xn.xa{color:var(--att);background:var(--attb)}.rl-a b.xa{color:var(--att)}' +
       'ul.rl li.done,ul.rl li.att{padding-left:8px}' +
       'ul.rl li.done{box-shadow:inset 3px 0 0 var(--pine2)}' +
-      'ul.rl li.att:not(.done){background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}' +
+      'ul.rl li.att:not(.done){box-shadow:inset 3px 0 0 var(--att)}' +
       'ul.rl li.att:not(.done) .rl-c{border-color:var(--att)}' +
       '.pg-b .row.cim{box-shadow:inset 3px 0 0 var(--pine2)}' +
-      '.pg-b .row.att{background:var(--attl);box-shadow:inset 3px 0 0 var(--att)}' +
+      '.pg-b .row.att{box-shadow:inset 3px 0 0 var(--att)}' +
       '.asc-n.att-n{background:var(--attb);color:var(--att)}' +
       '.asc-btns{display:flex;gap:8px;margin-top:8px}' +
       '.asc-btns .btn{flex:1;margin:0;padding-left:6px;padding-right:6px;font-weight:700;font-size:14px;line-height:1.25}' +
@@ -696,7 +697,7 @@
     function cimRows(items) {
       return '<ul class="rl">' + items.map(function (it) {
         var d = isDone(it.key), na = d ? nAsc(it.key) : 0, nt = attCount(it.key);
-        return '<li data-ckey="' + esc(it.key) + '"' + (d ? ' class="done"' : nt ? ' class="att"' : '') + '><span class="rl-c">' + (d ? '✓' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') + '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (na > 1 ? ' <b>×' + na + '</b>' : '') + (nt ? ' <small class="xt">' + attWord(nt) + '</small>' : '') + '</span></li>';
+        return '<li data-ckey="' + esc(it.key) + '"' + (d ? ' class="done"' : nt ? ' class="att"' : '') + '><span class="rl-c">' + (d ? '✓' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') + '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (na > 1 ? ' <b>×' + na + '</b>' : '') + (nt ? ' <b class="xa">×' + nt + '</b>' : '') + '</span></li>';
       }).join('') + '</ul>';
     }
     var byAlt = function (a, b) { return (b.alt || 0) - (a.alt || 0); };
@@ -810,7 +811,7 @@
   function rdRow(it) {
     var d = isDone(it.key), w = isWant(it.key), na = d ? nAsc(it.key) : 0, ld = d ? lastAsc(it.key) : '', sub = '';
     if (d) sub = (ld ? fmtDate(ld) : 'sen data') + (na > 1 ? ' <b>×' + na + '</b>' : '');
-    if (attCount(it.key)) sub += (sub ? ' · ' : '') + '<span class="xt">' + attWord(attCount(it.key)) + '</span>';
+    if (attCount(it.key)) sub += (sub ? ' · ' : '') + '<b class="xa">×' + attCount(it.key) + '</b>';
     else if (w) sub = '<span class="rd-w">★ quero facer' + (S.want[it.key].d ? ' · ' + esc(fmtDate(S.want[it.key].d).slice(0, 5)) : '') + '</span>';
     return '<li data-rdk="' + esc(it.key) + '"' + (d ? ' class="done"' : attCount(it.key) ? ' class="att"' : w ? ' class="want"' : '') + '><span class="rl-c">' + (d ? '✓' : w ? '★' : '') + '</span><span class="rl-b"><span class="rl-n">' + esc(it.name) + (it.e ? ' <i class="rl-e">E</i>' : '') +
       '</span><span class="rl-m">' + esc(it.meta) + '</span></span><span class="rl-a">' + fmtAlt(it.alt) + (sub ? '<small>' + sub + '</small>' : '') + '</span></li>';
@@ -1081,7 +1082,7 @@
       return '<li class="row' + (d ? ' done' : w ? ' want' : '') + (nt ? ' att' : '') + '" data-key="' + esc(it.key) + '" data-kind="' + it.kind + '" data-i="' + esc(it.kind === 'sostre' ? it.ref.id : it.kind === 'cat' ? it.ref.n : it.ref.id) + '">' +
         '<button class="chk" aria-label="Marcar como feito">' + (w ? '★' : '✓') + '</button><div class="body"><div class="nm">' + esc(it.name) + '</div>' +
         '<div class="meta">' + it.badges.map(function (b) { return '<span class="badge ' + b[1] + '" style="margin:0 4px 0 0">' + esc(b[0]) + '</span>'; }).join('') + esc(it.meta) + '</div></div>' +
-        '<div class="alt">' + fmtAlt(it.alt) + (na > 1 ? '<span class="xn">×' + na + '</span>' : '') + (tag ? '<small>' + tag + '</small>' : '') + (nt ? '<small class="xt">' + attWord(nt) + '</small>' : '') + '</div>' +
+        '<div class="alt">' + fmtAlt(it.alt) + (na > 1 ? '<span class="xn">×' + na + '</span>' : '') + (tag ? '<small>' + tag + '</small>' : '') + (nt ? '<span class="xn xa">×' + nt + '</span>' : '') + '</div>' +
         (d ? '' : '<button class="wnt' + (w ? ' on' : '') + '" aria-label="Quero facer">' + (w ? '★' : '☆') + '</button>') + '</li>';
     }).join('') : '<div class="empty">Ningún cume con estes filtros</div>';
   }
@@ -1454,7 +1455,7 @@
     var pds = climbGroup(p) ? ptOwn(p) : ptDates(p), pd0 = climbGroup(p) ? p.d : (pds[0] || p.d);
     return '<li class="row' + (sel ? ' rsel' : '') + ((isOwnCim(p) || (climbGroup(p) && p.ck && p.ck.length)) ? ' cim' : '') + ((nta || isOwnAtt(p)) ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
       '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [pd0 ? fmtDate(pd0) : '', p.la == null ? 'sen coordenadas' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
-      '<div class="alt">' + fmtAlt(p.h) + (pds.length > 1 ? '<span class="xn">×' + pds.length + '</span>' : '') + (nta ? '<small class="xt">' + attWord(nta) + '</small>' : '') + '</div></li>';
+      '<div class="alt">' + fmtAlt(p.h) + (pds.length > 1 ? '<span class="xn">×' + pds.length + '</span>' : '') + (nta ? '<span class="xn xa">×' + nta + '</span>' : '') + '</div></li>';
   }
   function rRow(r, i, col, tag) {
     var sel = SEL && SEL['r:' + i];
