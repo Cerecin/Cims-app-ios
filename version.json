@@ -1,7 +1,7 @@
 {
- "v": 99,
+ "v": 101,
  "name": "22/10/2026",
- "notes": "Sostres comarcals al mapa; «Companys» i «Què va passar» a tot arreu; llistes de companys a les estadístiques.",
+ "notes": "Els punts amb ascensions dins d'una sortida mostren la data i el recompte a la llista.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "3336aa11cc6bd62515421113308275591494a31a194af6739e5b6c1ccffb7d2b",
-   "n": 338863
+   "s": "3e0499d9abfd6271234482d1d511d19c42e61559091fcc5326085c81057378d9",
+   "n": 340911
   },
   {
    "p": "app.js",
-   "s": "6fd35818695dd04ec3bfcd08db67046592e70737d2db4ba429ec8db5e94ac857",
-   "n": 337847
+   "s": "dd0e1e858936da603499189e22088003543c690b11248a6b7bfebd628343411e",
+   "n": 339893
   },
   {
    "p": "comarques.js",
@@ -730,8 +730,8 @@
   },
   {
    "p": "style.css",
-   "s": "29dd1e4879a001e1711a80355c785982969a115df00e2ca475ed2f59eed3220d",
-   "n": 69071
+   "s": "6a92268dc3353f9de1f8917093e842bbb7f90cf9d518ac4224425725c4446e04",
+   "n": 68004
   },
   {
    "p": "sw.js",

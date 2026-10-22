@@ -45,6 +45,12 @@
       '.asc-w:not(.att-w) .att-l{color:var(--pine)}' +
       '.at-more{display:block;margin:10px auto 0;font-weight:600}' +
       '.att-l{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--att);margin:8px 0 3px}' +
+      '.vs-att{border-left:3px solid var(--att);padding-left:10px;border-top:0;margin:2px 0}' +
+      '.vs-att summary{display:block;list-style:none;cursor:pointer;padding:2px 0;font-weight:400}.vs-att summary::-webkit-details-marker{display:none}.vs-att>summary::after{content:none!important}.vs-att summary::marker{content:""}' +
+      '.vs-att .vs-n{font-weight:400}.vs-att .vs-m{font-weight:400}.vs-atx{font-weight:700}' +
+      '.vs-att[open] summary .vs-m,.vs-att[open] summary .vs-n{display:none}' +
+      '.vs-atx{color:var(--att)}' +
+      '.vs-att .asc-w{margin-top:6px}' +
       '.vs-at{font-size:12.5px;color:var(--att);font-weight:600;margin-top:3px}' +
       '.vchip.at{background:var(--attl);border-color:var(--attb);color:var(--att)}' +
       '.vchip.at button{color:var(--att)}' +
@@ -353,7 +359,17 @@
   // intents d'un punt d'escalada marcat com a cim (no té llista d'ascensions): bloc a part
   function attBlock(k) {
     var L = attGet(k), n = L.length;
-    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="asc-list">' + L.map(function (x, i) { return attRow(x, i, k); }).join('') + '</div>' : '') + ascBtns('') + '</div>';
+    var rows = L.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) { var p = a.x.d || '', q = b.x.d || ''; return p < q ? 1 : p > q ? -1 : 0; });
+    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="vs att-vs">' + rows.map(function (r) { return attCompact(r.x, r.i, k); }).join('') + '</div>' : '') + ascBtns('') + '</div>';
+  }
+  // mateix aspecte que les sortides (data a l'esquerra, text a sota), marcat com a intent; en tocar-lo s'obre l'edició
+  var ATOPEN = {};
+  document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.classList && d.classList.contains('vs-att')) ATOPEN[d.getAttribute('data-atk')] = d.open; }, true);
+  function attCompact(x, i, k) {
+    var lv = x.vid && visitOf(x.vid), key = k + '|' + i;
+    var tl = lv ? [lv.v.v, lv.p.n].filter(function (z, j, ar) { return z && ar.indexOf(z) === j; }).join(' · ') : '';
+    return '<details class="vs-i vs-att" data-atk="' + esc(key) + '"' + (ATOPEN[key] ? ' open' : '') + '><summary><div class="vs-h"><span>' + (x.d ? fmtDate(x.d) : '') + '</span><span class="vs-t"><b class="vs-atx">✕ Intento</b>' + (tl ? ' · ' + esc(tl) : '') + '</span></div>' +
+      (x.c ? '<div class="vs-m">' + esc(x.c) + '</div>' : '') + (x.m ? '<div class="vs-n">' + esc(x.m) + '</div>' : '') + (!x.c && !x.m ? '<div class="vs-m">Toca para engadir compañeiros e que pasou</div>' : '') + '</summary>' + attRow(x, i, k) + '</details>';
   }
   // retorna true si el clic era d'un intent; «redraw» torna a dibuixar la fitxa; «toAsc(x)» converteix l'intent en ascensió
   function attClick(b, k, redraw, toAsc) {
@@ -1432,9 +1448,11 @@
   function pRow(p, col) {
     var sel = SEL && SEL['p:' + p.id];
     var nta = attCount('p:' + p.id);
+    // en punts que no són d'escalada, les dates inclouen les de les sortides on s'ha pujat (cm), no només les pròpies
+    var pds = climbGroup(p) ? ptOwn(p) : ptDates(p), pd0 = climbGroup(p) ? p.d : (pds[0] || p.d);
     return '<li class="row' + (sel ? ' rsel' : '') + ((isOwnCim(p) || (climbGroup(p) && p.ck && p.ck.length)) ? ' cim' : '') + ((nta || isOwnAtt(p)) ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
-      '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [p.d ? fmtDate(p.d) : '', p.la == null ? 'sen coordenadas' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
-      '<div class="alt">' + fmtAlt(p.h) + (p.ds && p.ds.length > 1 ? '<span class="xn">×' + p.ds.length + '</span>' : '') + (nta ? '<small class="xt">' + attWord(nta) + '</small>' : '') + '</div></li>';
+      '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [pd0 ? fmtDate(pd0) : '', p.la == null ? 'sen coordenadas' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
+      '<div class="alt">' + fmtAlt(p.h) + (pds.length > 1 ? '<span class="xn">×' + pds.length + '</span>' : '') + (nta ? '<small class="xt">' + attWord(nta) + '</small>' : '') + '</div></li>';
   }
   function rRow(r, i, col, tag) {
     var sel = SEL && SEL['r:' + i];
