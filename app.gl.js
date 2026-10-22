@@ -54,7 +54,8 @@
       '.vs-at{font-size:12.5px;color:var(--att);font-weight:600;margin-top:3px}' +
       '.vchip.at{background:var(--attl);border-color:var(--attb);color:var(--att)}' +
       '.vchip.at button{color:var(--att)}' +
-      '.vchip.add.at{background:none}';
+      '.vchip.add.at{background:none}' +
+      '.vchip.add.at.on{background:var(--attl);font-weight:700}';
     document.head.appendChild(st);
   })();
   // Versió web (PWA): sense el pont d'Android l'estat es desa també a IndexedDB (localStorage té un límit de ~5 MB).
@@ -313,7 +314,8 @@
   function linkAtt(k, p, v) {
     var L = attGet(k).map(function (x) { return Object.assign({}, x); }), d = /^\d{4}-\d\d-\d\d$/.test(v.d || '') ? v.d : '';
     var mine = L.filter(function (x) { return x.vid === v.id; })[0];
-    if (mine) mine.d = d; else { var n = { d: d, pid: p.id, vid: v.id }; if (v.c) n.c = v.c; L.push(n); }
+    var free = !mine && d && L.filter(function (x) { return !x.vid && x.d === d; })[0];
+    if (free) { free.vid = v.id; free.pid = p.id; if (v.c && !free.c) free.c = v.c; } else if (mine) mine.d = d; else { var n = { d: d, pid: p.id, vid: v.id }; if (v.c) n.c = v.c; L.push(n); }
     attPut(k, L);
   }
   function unlinkAtt(k, vid) { attPut(k, attGet(k).filter(function (x) { return x.vid !== vid; })); }
@@ -367,7 +369,7 @@
   document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.classList && d.classList.contains('vs-att')) ATOPEN[d.getAttribute('data-atk')] = d.open; }, true);
   function attCompact(x, i, k) {
     var lv = x.vid && visitOf(x.vid), key = k + '|' + i;
-    var tl = lv ? [lv.v.v, lv.p.n].filter(function (z, j, ar) { return z && ar.indexOf(z) === j; }).join(' · ') : '';
+    var tl = lv ? [lv.v.v, ('p:' + lv.p.id) === k ? '' : lv.p.n].filter(function (z, j, ar) { return z && ar.indexOf(z) === j; }).join(' · ') : '';
     return '<details class="vs-i vs-att" data-atk="' + esc(key) + '"' + (ATOPEN[key] ? ' open' : '') + '><summary><div class="vs-h"><span>' + (x.d ? fmtDate(x.d) : '') + '</span><span class="vs-t"><b class="vs-atx">✕ Intento</b>' + (tl ? ' · ' + esc(tl) : '') + '</span></div>' +
       (x.c ? '<div class="vs-m">' + esc(x.c) + '</div>' : '') + (x.m ? '<div class="vs-n">' + esc(x.m) + '</div>' : '') + (!x.c && !x.m ? '<div class="vs-m">Toca para engadir compañeiros e que pasou</div>' : '') + '</summary>' + attRow(x, i, k) + '</details>';
   }
@@ -1692,7 +1694,7 @@
       '<div class="field"><label>Tipo</label><select id="vT">' + opt(VS_TIPUS.slice(), v.t) + '</select></div></div>' +
       '<div class="field"><label>Compañeiros</label><input id="vC" value="' + esc(v.c || '') + '" placeholder="Separados por comas"></div>' +
       '<div class="field"><label>Cumes desta saída <small>· contan como ascensión do cume</small></label><div id="vCm"></div><input id="vCs" type="search" autocomplete="off" placeholder="Engadir un cume: escribe o seu nome…"><div id="vCr" class="vcr"></div></div>' +
-      '<div class="field"><label>Cumes intentados <small>· non se chegou ao cume</small></label><div id="vAt"></div><input id="vAs" type="search" autocomplete="off" placeholder="Engadir un cume intentado: escribe o nome…"><div id="vAr" class="vcr"></div></div>' +
+      '<div class="field"><label>Cumes intentados <small>· non se chegou ao cume</small></label><div id="vAself"></div><div id="vAt"></div><input id="vAs" type="search" autocomplete="off" placeholder="Engadir un cume intentado: escribe o nome…"><div id="vAr" class="vcr"></div></div>' +
       '<div class="field"><label>Que pasou <small>· notas da saída</small></label><textarea id="vN" rows="4">' + esc(v.nt || '') + '</textarea></div>' +
       '<div class="btns"><button class="btn pri" data-a="save">Gardar</button><button class="btn" data-a="cancel">Cancelar</button>' + (isNew ? '' : '<button class="btn warn" data-a="del">Borrar</button>') + '</div>';
     openSheet(h);
@@ -1716,8 +1718,12 @@
         (sg.length ? '<div class="vsug">Feitos este día: ' + sg.map(function (k) { return '<button type="button" class="vchip add" data-a="cmadd" data-k="' + esc(k) + '">＋ ' + esc(nameOfKey(k)) + '</button>'; }).join('') + '</div>' : '');
     }
     var at = (v.at || []).slice();
+    var selfK = 'p:' + p.id;
     function atRender() {
-      $('#vAt').innerHTML = at.length ? '<div class="vchips">' + at.map(function (k) { return '<span class="vchip at">✕ ' + esc(nameOfKey(k)) + '<button type="button" data-a="atx" data-k="' + esc(k) + '" aria-label="Quitar">×</button></span>'; }).join('') + '</div>' : '';
+      var on = at.indexOf(selfK) >= 0;
+      $('#vAself').innerHTML = '<button type="button" class="vchip add at' + (on ? ' on' : '') + '" data-a="atself">' + (on ? '✕ Intento a «' : '＋ Esta saída foi un intento a «') + esc(p.n) + (on ? '» · non se chegou arriba' : '»') + '</button>';
+      var ato = at.filter(function (k) { return k !== selfK; });
+      $('#vAt').innerHTML = ato.length ? '<div class="vchips">' + ato.map(function (k) { return '<span class="vchip at">✕ ' + esc(nameOfKey(k)) + '<button type="button" data-a="atx" data-k="' + esc(k) + '" aria-label="Quitar">×</button></span>'; }).join('') + '</div>' : '';
     }
     function inList(L, k) { return L.some(function (c) { return attKey(c) === attKey(k); }); }
     cmRender(); atRender();
@@ -1734,6 +1740,7 @@
       var b = e.target.closest('[data-a]'); if (!b) return;
       var a = b.dataset.a;
       if (a === 'atadd') { var ak = b.dataset.k; if (!inList(at, ak)) at.push(ak); cm = cm.filter(function (c) { return attKey(c) !== attKey(ak); }); $('#vAs').value = ''; $('#vAr').innerHTML = ''; atRender(); cmRender(); return; }
+      if (a === 'atself') { if (at.indexOf(selfK) >= 0) at = at.filter(function (k) { return k !== selfK; }); else at.push(selfK); atRender(); return; }
       if (a === 'atx') { at = at.filter(function (k) { return k !== b.dataset.k; }); atRender(); return; }
       if (a === 'cmadd') { if (cm.indexOf(b.dataset.k) < 0) cm.push(b.dataset.k); at = at.filter(function (c) { return attKey(c) !== attKey(b.dataset.k); }); atRender(); $('#vCs').value = ''; $('#vCr').innerHTML = ''; cmRender(); return; }
       if (a === 'dpick') { $('#vD').value = b.dataset.d; cmRender(); return; }
@@ -1752,6 +1759,7 @@
         Object.keys(r).forEach(function (k) { if (r[k]) n[k] = r[k]; else delete n[k]; });
         var oldCm = isNew ? [] : (v.cm || []), oldAt = isNew ? [] : (v.at || []);
         if (at.length) { n.at = at.slice(); n.id = n.id || uid(); } else delete n.at;
+        if (at.indexOf(selfK) >= 0 && !p.cc && !p.ci && !(p.ck && p.ck.length)) p.ci = 1;
         if (cm.length) { n.cm = cm.slice(); n.id = n.id || uid(); if (!p.ck || !p.ck.length) p.ck = cm.slice(); ckCoords(p); } else delete n.cm;
         p.vs = p.vs || [];
         if (isNew) p.vs.push(n); else p.vs[idx] = n;

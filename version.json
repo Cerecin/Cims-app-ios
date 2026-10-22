@@ -1,7 +1,7 @@
 {
- "v": 101,
- "name": "22/10/2026",
- "notes": "Els punts amb ascensions dins d'una sortida mostren la data i el recompte a la llista.",
+ "v": 102,
+ "name": "23/10/2026",
+ "notes": "Marcar una sortida com a intent al mateix punt; data i recompte a la llista de punts.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "3e0499d9abfd6271234482d1d511d19c42e61559091fcc5326085c81057378d9",
-   "n": 340911
+   "s": "277e9f4125210a3d65d574dc3b8fc7ecb02fd241cf7b3393e99d604833e06823",
+   "n": 341841
   },
   {
    "p": "app.js",
-   "s": "dd0e1e858936da603499189e22088003543c690b11248a6b7bfebd628343411e",
-   "n": 339893
+   "s": "3eb01878b243666b7a84ea0dd848d0df19aae2930163f314d64ee3e0461081a6",
+   "n": 340831
   },
   {
    "p": "comarques.js",
