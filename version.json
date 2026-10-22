@@ -1,7 +1,7 @@
 {
- "v": 98,
- "name": "20/10/2026",
- "notes": "Llista completa d'intents, camps «amb qui» i «què va passar», motiu discret a les estadístiques.",
+ "v": 99,
+ "name": "22/10/2026",
+ "notes": "Sostres comarcals al mapa; «Companys» i «Què va passar» a tot arreu; llistes de companys a les estadístiques.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "47c99d41ee0a423a66f18d7a4f5e3e17ebedc98ee640cea2df316ed229a69740",
-   "n": 324686
+   "s": "3336aa11cc6bd62515421113308275591494a31a194af6739e5b6c1ccffb7d2b",
+   "n": 338863
   },
   {
    "p": "app.js",
-   "s": "3614a178a4bc21410ab8546011681fb8e08c19c941086af1cceefeeee8a189e2",
-   "n": 323699
+   "s": "6fd35818695dd04ec3bfcd08db67046592e70737d2db4ba429ec8db5e94ac857",
+   "n": 337847
   },
   {
    "p": "comarques.js",
