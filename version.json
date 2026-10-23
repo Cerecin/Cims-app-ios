@@ -1,7 +1,7 @@
 {
- "v": 104,
+ "v": 105,
  "name": "23/10/2026",
- "notes": "La barra vermella només als cims intentats i encara no aconseguits.",
+ "notes": "Botó enrere a la pantalla o fulla immediatament anterior; etiquetes i noms a la fitxa de company.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "36d35e5d3ea160b14e4eff1c04f46e8228d27b25ff3a9714b43a635dd06af122",
-   "n": 341904
+   "s": "386595c8ded047212f783bed137ccfbb46181d4005bedf9a60749e7a2cd8c707",
+   "n": 344297
   },
   {
    "p": "app.js",
-   "s": "9804ff2a5da5956c610fff43af35558d4ac828c3fe42ad1de61e5e29c187cf36",
-   "n": 340894
+   "s": "5ac65f602339b8ddba12c4b53484c870f3d2ce64683c653fe7904e256ee6fb6a",
+   "n": 343284
   },
   {
    "p": "comarques.js",

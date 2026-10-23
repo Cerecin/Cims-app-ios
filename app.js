@@ -1097,8 +1097,31 @@
   var sheetOpen = false;
   var sheetT = null;
   var MENU_SHOWN = false, FROM_MENU = false; // FROM_MENU: la fulla actual ve de Configuració (enrere hi torna)
+  // enrere de fulla a fulla: en obrir una fulla nova des d'una altra (p. ex. punt → formulari de sortida) la d'abans es guarda (amb els seus esdeveniments) i el botó enrere hi torna
+  var SH_STACK = [], SH_KEY = null;
+  var FORM_KEY = /^(Editar |Nova |Nou )/;
+  function shKey(html) { var m = /<h3>([\s\S]*?)<\/h3>(?:<div class="sub">([\s\S]*?)<\/div>)?/.exec(html || ''); return m ? m[1] + '|' + (m[2] || '') : null; }
+  function shPush(sh) {
+    var fr = document.createDocumentFragment();
+    while (sh.firstChild) fr.appendChild(sh.firstChild);
+    SH_STACK.push({ key: SH_KEY, fr: fr, y: sh.scrollTop, h: { onclick: sh.onclick, onchange: sh.onchange, oninput: sh.oninput, onkeydown: sh.onkeydown } });
+    if (SH_STACK.length > 12) SH_STACK.shift();
+  }
+  function shPop() {
+    var e = SH_STACK.pop(), sh = $('#sheet'); if (!e) return false;
+    while (sh.firstChild) sh.removeChild(sh.firstChild);
+    sh.appendChild(e.fr); sh.onclick = e.h.onclick; sh.onchange = e.h.onchange; sh.oninput = e.h.oninput; sh.onkeydown = e.h.onkeydown;
+    SH_KEY = e.key; sh.scrollTop = e.y; return true;
+  }
   function openSheet(html) {
     var sh = $('#sheet'), sc = $('#scrim'), wasOpen = sheetOpen && !sh.classList.contains('closing');
+    var key = shKey(html), viaMenu = MENU_SHOWN || FROM_MENU || !!SHEET_UP;
+    if (wasOpen && !viaMenu && key && SH_KEY && key !== SH_KEY) {
+      var top = SH_STACK[SH_STACK.length - 1];
+      if (FORM_KEY.test(SH_KEY)) SH_STACK.pop();   // desar o cancel·lar un formulari: la fulla nova substitueix la d'on venia
+      else if (top && top.key === key) SH_STACK.pop(); else shPush(sh);   // tornar a una fulla ja oberta = no s'apila
+    } else if (!wasOpen || viaMenu || !key) { if (!wasOpen || viaMenu) SH_STACK = []; }
+    SH_KEY = key;
     MENU_SHOWN = false;
     clearTimeout(sheetT); sh.classList.remove('closing'); sc.classList.remove('closing');
     sh.style.transform = sh.style.transition = sc.style.opacity = sc.style.transition = '';
@@ -1107,7 +1130,7 @@
   }
   var SHEET_BACK = null;
   function closeSheet() {
-    var sh = $('#sheet'), sc = $('#scrim'); sheetOpen = false; SHEET_BACK = null; SHEET_UP = null; FROM_MENU = false;
+    var sh = $('#sheet'), sc = $('#scrim'); sheetOpen = false; SHEET_BACK = null; SHEET_UP = null; FROM_MENU = false; SH_STACK = []; SH_KEY = null;
     if (sh.classList.contains('hidden')) return;
     sh.classList.add('closing'); sc.classList.add('closing');
     clearTimeout(sheetT);
@@ -3338,6 +3361,7 @@
   }
   // ---- «Companys»: tot el que porta companys (ascensions, dates de punts, sortides, intents, rutes) amb data
   var WT = { cim: ['cim', 'cims'], alp: ["sortida d'alpinisme", "sortides d'alpinisme"], esc: ['escalada', 'escalades'], fer: ['ferrada', 'ferrades'], ruta: ['ruta', 'rutes'], intent: ['intent', 'intents'] };
+  var WL = { cim: 'Cim', alp: 'Alpinisme', esc: 'Escalada', fer: 'Via ferrada', ruta: 'Ruta', intent: 'Intent' };
   var WTABS = [['cims', 'Cims'], ['alp', 'Alpinisme'], ['esc', 'Escalades'], ['fer', 'Ferrades'], ['gen', 'General'], ['dies', 'Jornades'], ['int', 'Intents']];
   var WTAB = 'cims', WSORT = 'c';
   function isoD(d) { return /^\d{4}-\d\d-\d\d$/.test(d || ''); }
@@ -3355,7 +3379,7 @@
       if (officialPoint(p)) return;
       if (!climbGroup(p)) Object.keys(p.aw || {}).forEach(function (d) { add(p.aw[d], d, 'cim', p.n, 'p:' + p.id, p.ac && p.ac[d]); });
       (p.vs || []).forEach(function (v) {
-        add(v.c, v.d, visitCat(p, v), v.v || p.n, 'p:' + p.id, v.nt);
+        add(v.c, v.d, visitCat(p, v), visitCat(p, v) === 'alp' ? p.n : (v.v || p.n), 'p:' + p.id, v.nt);
         (v.cm || []).forEach(function (k) { add(v.c, v.d, 'cim', nameOfKey(k), attKey(k), v.nt, true); });
         if (isOwnCim(p)) add(v.c, v.d, 'cim', p.n, 'p:' + p.id, v.nt, true);
       });
@@ -3414,7 +3438,7 @@
       '<div class="at-all"><div class="st-h2" style="margin-top:10px">Què heu fet</div><div class="lr" style="cursor:default"><span class="tn" style="font-size:13.5px">' + esc(wBreak(E.filter(function (e) { return !e.der; })) || '—') + '</span></div>' +
       '<div class="st-h2" style="margin-top:12px">Jornades per any</div>' + Object.keys(yrs).sort().reverse().map(function (y) { var n = Object.keys(yrs[y]).length; return '<div class="lr" style="cursor:default"><span class="tn">' + y + '</span><small>' + n + (n === 1 ? ' jornada' : ' jornades') + '</small></div>'; }).join('') +
       '<div class="st-h2" style="margin-top:12px">Activitats</div>' + E.filter(function (e) { return !e.der; }).map(function (e, i) {
-        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WT[e.t][0] + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
+        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WL[e.t] + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
       }).join('') + '</div>');
     $('#sheet').onclick = function (ev) {
       if (ev.target.closest('[data-wback]')) { closeSheet(); return; }
@@ -3672,9 +3696,12 @@
   function setTopFor(v) {
     document.body.setAttribute('data-v', v);
   }
+  var NAV_STACK = [], NAV_BACK = false;
   function showView(v) {
     if (v !== 'punts' && SEL) { SEL = null; var rb = $('#rSelBar'); if (rb) rb.remove(); document.body.classList.remove('rsel-on'); DIRTY.punts = true; }
     var prev = view; view = v;
+    if (prev !== v && !NAV_BACK) { var pvw = $('#v-' + prev); NAV_STACK.push({ v: prev, y: pvw ? pvw.scrollTop : 0, w: window.scrollY || 0 }); if (NAV_STACK.length > 40) NAV_STACK.shift(); }
+    NAV_BACK = false;
     var from = $('#v-' + prev), to = $('#v-' + v);
     clearTimeout(viewT);
     $$('.view').forEach(function (s) { VIEW_CLS.forEach(function (c) { s.classList.remove(c); }); s.classList.toggle('active', s.id === 'v-' + v); });
@@ -3878,10 +3905,16 @@
     if ($('#phView')) { closePhoto(); return true; }
     if (SEL) { selEnd(); return true; }
     if (!$('#celebrate').classList.contains('hidden')) { $('#celebrate').classList.add('hidden'); return true; }
-    if (sheetOpen) { if (SHEET_UP) { var up = SHEET_UP; SHEET_UP = null; up(); } else if (FROM_MENU && !MENU_SHOWN) openMenu(); else closeSheet(); return true; }
+    if (sheetOpen) { if (SHEET_UP) { var up = SHEET_UP; SHEET_UP = null; up(); } else if (SH_STACK.length) shPop(); else if (FROM_MENU && !MENU_SHOWN) openMenu(); else closeSheet(); return true; }
     if (!$('#layerPanel').classList.contains('hidden')) { $('#layerPanel').classList.add('hidden'); return true; }
     if (pickMode) { pickMode = false; draft = null; toast('Cancel·lat'); return true; }
     if (RET && RET.v !== view && retGo()) return true;
+    while (NAV_STACK.length) {
+      var nv = NAV_STACK.pop(); if (nv.v === view) continue;
+      NAV_BACK = true; showView(nv.v);
+      setTimeout(function () { var vv = $('#v-' + nv.v); if (vv) vv.scrollTop = nv.y; window.scrollTo(0, nv.w || 0); }, 120);
+      return true;
+    }
     if (view !== 'resum') { showView('resum'); return true; }
     return false;
   };
