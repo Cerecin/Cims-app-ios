@@ -1,7 +1,7 @@
 {
- "v": 107,
+ "v": 108,
  "name": "23/10/2026",
- "notes": "Fitxa de company: el lloc surt a cada activitat.",
+ "notes": "Fitxa de company: «Via - Lloc» al títol de cada activitat.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "08410513fa0a040d68e6f10f4df22895daf670ba71e13e9dc65002c5cf1d0148",
-   "n": 345038
+   "s": "e5d000bb40931bdb91e75140ff39ddd884e7e3fdb3f2c1bba7e5c1d6c90b8977",
+   "n": 345037
   },
   {
    "p": "app.js",
-   "s": "ed0082650e62736e89c98cae46b7f9da0698b46098734c68c03e13184a08d2b2",
-   "n": 344028
+   "s": "61dd4447f0c9060304f1f914e099251325be851e8ac1b657ef71b5e8461c6a00",
+   "n": 344027
   },
   {
    "p": "comarques.js",

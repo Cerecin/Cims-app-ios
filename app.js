@@ -3445,7 +3445,7 @@
       '<div class="at-all"><div class="st-h2" style="margin-top:10px">Què heu fet</div><div class="lr" style="cursor:default"><span class="tn" style="font-size:13.5px">' + esc(wBreak(E.filter(function (e) { return !e.der; })) || '—') + '</span></div>' +
       '<div class="st-h2" style="margin-top:12px">Jornades per any</div>' + Object.keys(yrs).sort().reverse().map(function (y) { var n = Object.keys(yrs[y]).length; return '<div class="lr" style="cursor:default"><span class="tn">' + y + '</span><small>' + n + (n === 1 ? ' jornada' : ' jornades') + '</small></div>'; }).join('') +
       '<div class="st-h2" style="margin-top:12px">Activitats</div>' + E.filter(function (e) { return !e.der; }).map(function (e, i) {
-        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WL[e.t] + (e.pl && e.pl !== e.n ? ' · ' + esc(e.pl) : '') + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
+        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + (e.pl && e.pl !== e.n ? ' - ' + esc(e.pl) : '') + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WL[e.t] + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
       }).join('') + '</div>');
     $('#sheet').onclick = function (ev) {
       if (ev.target.closest('[data-wback]')) { closeSheet(); return; }
