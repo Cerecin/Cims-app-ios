@@ -3363,8 +3363,8 @@
   // ---- «Companys»: tot el que porta companys (ascensions, dates de punts, sortides, intents, rutes) amb data
   var WT = { cim: ['cume', 'cumes'], alp: ['saída de alpinismo', 'saídas de alpinismo'], esc: ['escalada', 'escaladas'], fer: ['ferrata', 'ferratas'], ruta: ['ruta', 'rutas'], intent: ['intento', 'intentos'] };
   var WL = { cim: 'Cume', alp: 'Alpinismo', esc: 'Escalada', fer: 'Vía ferrada', ruta: 'Ruta', intent: 'Intento' };
-  var WTABS = [['cims', 'Cumes'], ['alp', 'Alpinismo'], ['esc', 'Escaladas'], ['fer', 'Ferratas'], ['gen', 'Xeral'], ['dies', 'Xornadas'], ['int', 'Intentos']];
-  var WTAB = 'cims', WSORT = 'c';
+  var WTABS = [['gen', 'Todo'], ['cims', 'Cumes'], ['alp', 'Alpinismo'], ['esc', 'Escaladas'], ['fer', 'Ferratas'], ['dies', 'Xornadas'], ['int', 'Intentos']];
+  var WTAB = 'gen', WSORT = 'c', WALL = false;
   function isoD(d) { return /^\d{4}-\d\d-\d\d$/.test(d || ''); }
   // der = esdeveniment derivat (un cim pujat dins d'una sortida o ruta): compta a la llista de cims però no s'afegeix al total general
   function whoEvents() {
@@ -3414,7 +3414,14 @@
       var o = P[kk], ev = o.ev, r = { k: kk, name: o.n };
       if (tab === 'cims') { var c = ev.filter(function (e) { return e.t === 'cim'; }); if (!c.length) return; var nk = wDistinct(c, function (e) { return e.k; }), na = wDistinct(c, function (e) { return e.k + '|' + e.d; }); r.o1 = nk; r.o2 = na; r.main = wCount(nk, 'cim'); r.sub = na + (na === 1 ? ' ascensión' : ' ascensións') + ' · ' + wDaysTxt(wDays(c)); }
       else if (tab === 'alp' || tab === 'esc' || tab === 'fer') { var v = ev.filter(function (e) { return e.t === tab; }); if (!v.length) return; r.o1 = v.length; r.o2 = wDays(v); r.main = wCount(v.length, tab); r.sub = wDaysTxt(wDays(v)); }
-      else if (tab === 'gen') { var g = ev.filter(function (e) { return !e.der; }); if (!g.length) return; r.o1 = g.length; r.o2 = wDays(g); r.main = g.length + (g.length === 1 ? ' actividade' : ' actividades'); r.sub = wBreak(g); }
+      else if (tab === 'gen') {
+        var nd0 = wDays(ev); if (!nd0) return;
+        var cc = ev.filter(function (e) { return e.t === 'cim'; }), nck = wDistinct(cc, function (e) { return e.k; }), bits = [];
+        if (nck) bits.push(wCount(nck, 'cim'));
+        ['alp', 'esc', 'fer', 'ruta'].forEach(function (t) { var n = ev.filter(function (e) { return e.t === t; }).length; if (n) bits.push(wCount(n, t)); });
+        var ni = ev.filter(function (e) { return e.t === 'intent'; }).length; if (ni) bits.push(wCount(ni, 'intent'));
+        r.o1 = nd0; r.o2 = ev.length; r.main = wDaysTxt(nd0); r.sub = bits.join(' · ');
+      }
       else if (tab === 'dies') { var dd = wDays(ev); r.o1 = dd; r.o2 = ev.length; r.main = dd + (dd === 1 ? ' xornada' : ' xornadas'); r.sub = wBreak(ev); }
       else { var it = ev.filter(function (e) { return e.t === 'intent'; }); if (!it.length) return; var ik = wDistinct(it, function (e) { return e.k; }), id = wDays(it); if (WSORT === 'd') { r.o1 = id; r.o2 = ik; } else { r.o1 = ik; r.o2 = id; } r.main = wCount(ik, 'cim'); r.sub = wDaysTxt(id); }
       rows.push(r);
@@ -3422,12 +3429,12 @@
     return rows.sort(function (a, b) { return b.o1 - a.o1 || b.o2 - a.o2 || (a.name < b.name ? -1 : 1); });
   }
   function whoCard(r) {
-    var E = whoEvents().filter(function (e) { return e.d >= r.a && e.d <= r.b; }), rows = whoRows(E, WTAB).slice(0, 15);
+    var E = whoEvents().filter(function (e) { return e.d >= r.a && e.d <= r.b; }), allRows = whoRows(E, WTAB), rows = WALL ? allRows : allRows.slice(0, 15);
     var tabs = '<div class="st-wt">' + WTABS.map(function (t) { return '<button data-wtab="' + t[0] + '" class="' + (t[0] === WTAB ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>' +
       (WTAB === 'int' ? '<div class="st-wt"><button data-wsort="c" class="' + (WSORT === 'c' ? 'on' : '') + '"Máis cumes</button><button data-wsort="d" class="' + (WSORT === 'd' ? 'on' : '') + '">Máis días</button></div>' : '');
     return '<div class="st-h2">Compañeiros</div>' + tabs + (rows.length ? rows.map(function (x) {
       return '<div class="lr at-r" data-who="' + esc(x.k) + '"><span class="tn">' + esc(x.name) + '</span><small>' + x.main + '</small>' + (x.sub ? '<div class="at-c">' + esc(x.sub) + '</div>' : '') + '</div>';
-    }).join('') : '<div class="empty" style="padding:14px 4px">Ningún compañeiro con data neste período.</div>');
+    }).join('') + (allRows.length > 15 ? '<button class="chip at-more" data-wall="1">' + (WALL ? 'Mostrar menos' : 'Mostrar todos (' + allRows.length + ')') + '</button>' : '') : '<div class="empty" style="padding:14px 4px">Ningún compañeiro con data neste período.</div>');
   }
   // fitxa d'una persona: tot l'historial
   function whoOpen(key) {
@@ -3649,7 +3656,7 @@
     if (t.id === 'stYr' && t.value) { STP = t.value; renderStats(); }
     else if (t.id === 'stA' || t.id === 'stB') { var a = $('#stA').value, b = $('#stB').value; if (a && b) { STC = { a: a, b: b }; renderStats(); } }
   });
-  $('#v-stats').addEventListener('click', function (e) { if (e.target.closest('[data-attall]')) { attAllOpen(); return; } var wt = e.target.closest('[data-wtab],[data-wsort]'); if (wt) { if (wt.dataset.wtab) WTAB = wt.dataset.wtab; else WSORT = wt.dataset.wsort; var wb = $('#whoBox'); if (wb) wb.innerHTML = whoCard(statPeriod(STP)); return; } var wh = e.target.closest('[data-who]'); if (wh) { whoOpen(wh.dataset.who); return; } var d = e.target.closest('[data-tk]'); if (!d) return; var tk = d.dataset.tk; if (tk.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === tk.slice(2); })[0]; if (pp) openPoint(pp); return; } var it = itemByKey(tk); if (it) openItem(it); });
+  $('#v-stats').addEventListener('click', function (e) { if (e.target.closest('[data-attall]')) { attAllOpen(); return; } var wt = e.target.closest('[data-wtab],[data-wsort],[data-wall]'); if (wt) { if (wt.dataset.wtab) WTAB = wt.dataset.wtab; else if (wt.dataset.wall) WALL = !WALL; else WSORT = wt.dataset.wsort; var wb = $('#whoBox'); if (wb) wb.innerHTML = whoCard(statPeriod(STP)); return; } var wh = e.target.closest('[data-who]'); if (wh) { whoOpen(wh.dataset.who); return; } var d = e.target.closest('[data-tk]'); if (!d) return; var tk = d.dataset.tk; if (tk.slice(0, 2) === 'p:') { var pp = S.points.filter(function (x) { return x.id === tk.slice(2); })[0]; if (pp) openPoint(pp); return; } var it = itemByKey(tk); if (it) openItem(it); });
 
   // ---------- importar tracks ----------
   function simplify(pts, minM) {

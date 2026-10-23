@@ -1,7 +1,7 @@
 {
- "v": 105,
+ "v": 106,
  "name": "23/10/2026",
- "notes": "Botó enrere a la pantalla o fulla immediatament anterior; etiquetes i noms a la fitxa de company.",
+ "notes": "Companys: pestanya «Tot» amb el resum complet de cada persona.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "386595c8ded047212f783bed137ccfbb46181d4005bedf9a60749e7a2cd8c707",
-   "n": 344297
+   "s": "25882948b57cf691fe44801991ab2a13bfb80130d7d3fefa10cdde99d5b31246",
+   "n": 344957
   },
   {
    "p": "app.js",
-   "s": "5ac65f602339b8ddba12c4b53484c870f3d2ce64683c653fe7904e256ee6fb6a",
-   "n": 343284
+   "s": "b51ee9b130476ba1f86f6e91c6f4c17e4324b972e5c26d706447b3cfbe52d199",
+   "n": 343947
   },
   {
    "p": "comarques.js",
