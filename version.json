@@ -1,7 +1,7 @@
 {
- "v": 106,
+ "v": 107,
  "name": "23/10/2026",
- "notes": "Companys: pestanya «Tot» amb el resum complet de cada persona.",
+ "notes": "Fitxa de company: el lloc surt a cada activitat.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "25882948b57cf691fe44801991ab2a13bfb80130d7d3fefa10cdde99d5b31246",
-   "n": 344957
+   "s": "08410513fa0a040d68e6f10f4df22895daf670ba71e13e9dc65002c5cf1d0148",
+   "n": 345038
   },
   {
    "p": "app.js",
-   "s": "b51ee9b130476ba1f86f6e91c6f4c17e4324b972e5c26d706447b3cfbe52d199",
-   "n": 343947
+   "s": "ed0082650e62736e89c98cae46b7f9da0698b46098734c68c03e13184a08d2b2",
+   "n": 344028
   },
   {
    "p": "comarques.js",

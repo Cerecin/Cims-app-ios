@@ -3368,7 +3368,7 @@
   // der = esdeveniment derivat (un cim pujat dins d'una sortida o ruta): compta a la llista de cims però no s'afegeix al total general
   function whoEvents() {
     var E = [], seen = {};
-    function add(who, d, t, n, k, m, der) { if (!who || !isoD(d)) return; splitPeople(who).forEach(function (p) { E.push({ p: p, d: d, t: t, n: n, k: k, m: m || '', der: !!der }); }); }
+    function add(who, d, t, n, k, m, der, pl) { if (!who || !isoD(d)) return; splitPeople(who).forEach(function (p) { E.push({ p: p, d: d, t: t, n: n, k: k, m: m || '', der: !!der, pl: pl || '' }); }); }
     function visitCat(p, v) { var t = String(v.t || '').toLowerCase(); if (p.g === 'Ferrades' || t === 'ferrata') return 'fer'; if (p.g === 'Alpinisme' || t === 'alpinisme') return 'alp'; return 'esc'; }
     Object.keys(S.done).forEach(function (k) {
       var tk = twinKeys(k), c = tk[0]; if (seen[c] || !tk.some(listOnFor)) return; seen[c] = 1;
@@ -3379,7 +3379,7 @@
       if (officialPoint(p)) return;
       if (!climbGroup(p)) Object.keys(p.aw || {}).forEach(function (d) { add(p.aw[d], d, 'cim', p.n, 'p:' + p.id, p.ac && p.ac[d]); });
       (p.vs || []).forEach(function (v) {
-        add(v.c, v.d, visitCat(p, v), visitCat(p, v) === 'alp' ? p.n : (v.v || p.n), 'p:' + p.id, v.nt);
+        add(v.c, v.d, visitCat(p, v), visitCat(p, v) === 'alp' ? p.n : (v.v || p.n), 'p:' + p.id, v.nt, false, p.n);
         (v.cm || []).forEach(function (k) { add(v.c, v.d, 'cim', nameOfKey(k), attKey(k), v.nt, true); });
         if (isOwnCim(p)) add(v.c, v.d, 'cim', p.n, 'p:' + p.id, v.nt, true);
       });
@@ -3445,7 +3445,7 @@
       '<div class="at-all"><div class="st-h2" style="margin-top:10px">Què heu fet</div><div class="lr" style="cursor:default"><span class="tn" style="font-size:13.5px">' + esc(wBreak(E.filter(function (e) { return !e.der; })) || '—') + '</span></div>' +
       '<div class="st-h2" style="margin-top:12px">Jornades per any</div>' + Object.keys(yrs).sort().reverse().map(function (y) { var n = Object.keys(yrs[y]).length; return '<div class="lr" style="cursor:default"><span class="tn">' + y + '</span><small>' + n + (n === 1 ? ' jornada' : ' jornades') + '</small></div>'; }).join('') +
       '<div class="st-h2" style="margin-top:12px">Activitats</div>' + E.filter(function (e) { return !e.der; }).map(function (e, i) {
-        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WL[e.t] + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
+        return '<div class="lr at-r" data-wi="' + E.indexOf(e) + '"><span class="tn">' + esc(e.n) + '</span><small>' + fmtDate(e.d) + '</small><div class="at-c">' + WL[e.t] + (e.pl && e.pl !== e.n ? ' · ' + esc(e.pl) : '') + (e.m ? ' · ' + esc(e.m) : '') + '</div></div>';
       }).join('') + '</div>');
     $('#sheet').onclick = function (ev) {
       if (ev.target.closest('[data-wback]')) { closeSheet(); return; }
