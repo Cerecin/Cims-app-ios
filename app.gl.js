@@ -1453,7 +1453,8 @@
     var nta = attCount('p:' + p.id);
     // en punts que no són d'escalada, les dates inclouen les de les sortides on s'ha pujat (cm), no només les pròpies
     var pds = climbGroup(p) ? ptOwn(p) : ptDates(p), pd0 = climbGroup(p) ? p.d : (pds[0] || p.d);
-    return '<li class="row' + (sel ? ' rsel' : '') + ((isOwnCim(p) || (climbGroup(p) && p.ck && p.ck.length)) ? ' cim' : '') + ((nta || isOwnAtt(p)) ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
+    var gotIt = isOwnCim(p) || (climbGroup(p) && p.ck && p.ck.length), hasUp = gotIt || (!climbGroup(p) && pds.length > 0);
+    return '<li class="row' + (sel ? ' rsel' : '') + (gotIt ? ' cim' : '') + (((nta || isOwnAtt(p)) && !hasUp) ? ' att' : '') + '" data-pid="' + esc(p.id) + '"><div class="chk" style="border-color:' + col + ';color:' + col + '">' + (SEL ? (sel ? '✓' : '') : '') + '</div>' +
       '<div class="body"><div class="nm">' + esc(p.n) + '</div><div class="meta">' + [pd0 ? fmtDate(pd0) : '', p.la == null ? 'sen coordenadas' : '', p.nt ? esc(p.nt) : ''].filter(Boolean).join(' · ') + '</div></div>' +
       '<div class="alt">' + fmtAlt(p.h) + (pds.length > 1 ? '<span class="xn">×' + pds.length + '</span>' : '') + (nta ? '<span class="xn xa">×' + nta + '</span>' : '') + '</div></li>';
   }

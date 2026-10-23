@@ -1,7 +1,7 @@
 {
- "v": 103,
+ "v": 104,
  "name": "23/10/2026",
- "notes": "Intents com a ×N en vermell a les llistes, igual que les ascensions en verd.",
+ "notes": "La barra vermella només als cims intentats i encara no aconseguits.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "3b30ab3ba9a83637376b1afe1342c3aa2b2af88ad2080bb20447817bf2b95928",
-   "n": 341818
+   "s": "36d35e5d3ea160b14e4eff1c04f46e8228d27b25ff3a9714b43a635dd06af122",
+   "n": 341904
   },
   {
    "p": "app.js",
-   "s": "fba2067296bc4b2abc035d895e0cb26d72ca7d68270f0002ec4d04d76793f1e5",
-   "n": 340808
+   "s": "9804ff2a5da5956c610fff43af35558d4ac828c3fe42ad1de61e5e29c187cf36",
+   "n": 340894
   },
   {
    "p": "comarques.js",
