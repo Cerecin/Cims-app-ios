@@ -1,7 +1,7 @@
 {
- "v": 108,
+ "v": 110,
  "name": "23/10/2026",
- "notes": "Fitxa de company: «Via - Lloc» al títol de cada activitat.",
+ "notes": "Els companys segueixen la data també en editar el punt des del formulari.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "e5d000bb40931bdb91e75140ff39ddd884e7e3fdb3f2c1bba7e5c1d6c90b8977",
-   "n": 345037
+   "s": "373fe842f99d355e45c31dfa4b91b540041417edc614ba851d27084e010d591d",
+   "n": 346121
   },
   {
    "p": "app.js",
-   "s": "61dd4447f0c9060304f1f914e099251325be851e8ac1b657ef71b5e8461c6a00",
-   "n": 344027
+   "s": "144af86ba4ff44e85e3dc3782c87829557eb2c0e6f5bbbb077a26dfc766b5a2f",
+   "n": 345111
   },
   {
    "p": "comarques.js",

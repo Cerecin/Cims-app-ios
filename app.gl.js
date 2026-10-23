@@ -1829,6 +1829,7 @@
           var D = ptAscDates(p), old = D[+inp.dataset.pdi], nw = inp.value; if (!nw || nw === old) return;
           var O2 = ptOwn(p), oi = O2.indexOf(old); if (oi < 0) return; O2[oi] = nw; ptSetDates(p, O2);
           if (p.ac && p.ac[old]) { p.ac[nw] = p.ac[nw] ? p.ac[nw] + ' · ' + p.ac[old] : p.ac[old]; delete p.ac[old]; }
+          if (p.aw && p.aw[old]) { p.aw[nw] = p.aw[nw] ? p.aw[nw] + ', ' + p.aw[old] : p.aw[old]; delete p.aw[old]; }
           save(); refreshAll(); openPoint(p);
         };
       });
@@ -2026,6 +2027,8 @@
         else ckCoords(r);
         if (!r.cc || !climbGroup(r) || r.ck) delete r.cc;
         if (!r.ci || !climbGroup(r) || r.ck || r.cc) delete r.ci;
+        // si es canvia la data des del formulari, els companys i la nota d'aquella ascensió la segueixen
+        if (!isNew && p.d && r.d && r.d !== p.d) ['aw', 'ac'].forEach(function (f) { if (p[f] && p[f][p.d]) { p[f][r.d] = p[f][r.d] ? p[f][r.d] + (f === 'aw' ? ', ' : ' · ') + p[f][p.d] : p[f][p.d]; delete p[f][p.d]; } });
         var tgt = r;
         if (isNew) { r.id = uid(); S.points.unshift(r); } else { Object.assign(p, r); if (!p.ds) delete p.ds; if (!r.z) delete p.z; if (!r.ck) delete p.ck; if (!r.cc) delete p.cc; if (!r.ci) delete p.ci; tgt = p; }
         linkPointCims(tgt);
@@ -3378,7 +3381,7 @@
     });
     S.points.forEach(function (p) {
       if (officialPoint(p)) return;
-      if (!climbGroup(p)) Object.keys(p.aw || {}).forEach(function (d) { add(p.aw[d], d, 'cim', p.n, 'p:' + p.id, p.ac && p.ac[d]); });
+      if (!climbGroup(p)) { var okd = ptAscDates(p); Object.keys(p.aw || {}).filter(function (d) { return okd.indexOf(d) >= 0; }).forEach(function (d) { add(p.aw[d], d, 'cim', p.n, 'p:' + p.id, p.ac && p.ac[d]); }); }
       (p.vs || []).forEach(function (v) {
         add(v.c, v.d, visitCat(p, v), visitCat(p, v) === 'alp' ? p.n : (v.v || p.n), 'p:' + p.id, v.nt, false, p.n);
         (v.cm || []).forEach(function (k) { add(v.c, v.d, 'cim', nameOfKey(k), attKey(k), v.nt, true); });
@@ -4025,6 +4028,16 @@
   S = load(); syncTwins(); visitBackfill(); ckBackfill(); orphanDates(); dropLabels(); S.points.forEach(function (p) { if (climbGroup(p)) ckCoords(p); });
   save(); flushSave();
   setTopFor(view);
+  // «Companys» / «Què va passar» d'una data que ja no existeix al punt (p. ex. data canviada abans de la v0.109): no es veuen ni es poden editar; s'esborren
+  (function () {
+    var ch = 0;
+    S.points.forEach(function (p) {
+      if (climbGroup(p) || !(p.aw || p.ac)) return;
+      var ok = ptAscDates(p);
+      ['aw', 'ac'].forEach(function (f) { if (!p[f]) return; Object.keys(p[f]).forEach(function (d) { if (ok.indexOf(d) < 0) { delete p[f][d]; ch++; } }); if (!Object.keys(p[f]).length) delete p[f]; });
+    });
+    if (ch) save();
+  })();
   refreshAll();
   checkMedals(true);
   cloudOnStart();
