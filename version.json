@@ -1,7 +1,7 @@
 {
- "v": 110,
- "name": "23/10/2026",
- "notes": "Els companys segueixen la data també en editar el punt des del formulari.",
+ "v": 111,
+ "name": "26/10/2026",
+ "notes": "Escalades: «Vies». Cercador buit, ordre per vegades pujat, botons d'ascensió dalt i dates de més noves a més velles.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "373fe842f99d355e45c31dfa4b91b540041417edc614ba851d27084e010d591d",
-   "n": 346121
+   "s": "9d182a6d45e2480ea288b39d5841c62dc3d72bb99a6fd28fae72916e775943ab",
+   "n": 347473
   },
   {
    "p": "app.js",
-   "s": "144af86ba4ff44e85e3dc3782c87829557eb2c0e6f5bbbb077a26dfc766b5a2f",
-   "n": 345111
+   "s": "748e5d7b85c5178ecc6665b4dd8d93d41de190cf680c23e0d1e8e1a63748e942",
+   "n": 346457
   },
   {
    "p": "comarques.js",

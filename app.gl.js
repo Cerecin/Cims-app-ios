@@ -350,11 +350,11 @@
     var AT = attGet(k), rows = [];
     if (done) A.forEach(function (x, i) { rows.push({ d: x.d || '', k: 0, html: ascRow(x, i) }); });
     AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i, k) }); });
-    return '<div class="field">' + (rows.length ? '<label>' + ascLabel(done ? A.length : 0, AT.length, done) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' : '') + ascBtns('aadd') + '</div>';
+    return '<div class="field">' + ascBtns('aadd') + (rows.length ? '<label style="margin-top:12px">' + ascLabel(done ? A.length : 0, AT.length, done) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' : '') + '</div>';
   }
-  // ascensions i intents barrejats, per data (sense data al final; a igualtat, primer les ascensions)
+  // ascensions i intents barrejats, per data: les més noves a dalt i les més velles a baix (sense data al final; a igualtat, primer les ascensions)
   function mixRows(rows) {
-    return rows.map(function (r, i) { r.o = i; return r; }).sort(function (a, b) { var p = a.d || '9999', q = b.d || '9999'; return p < q ? -1 : p > q ? 1 : a.k - b.k || a.o - b.o; }).map(function (r) { return r.html; }).join('');
+    return rows.map(function (r, i) { r.o = i; return r; }).sort(function (a, b) { if (!a.d !== !b.d) return a.d ? -1 : 1; var p = a.d || '', q = b.d || ''; return p < q ? 1 : p > q ? -1 : a.k - b.k || b.o - a.o; }).map(function (r) { return r.html; }).join('');
   }
   function ascLabel(nA, nT, undatedHint) {
     return (nA ? (nA === 1 ? '1 ascensión' : nA + ' ascensións') : '') + (nA && nT ? ' · ' : '') + (nT ? attWord(nT) : '') + (undatedHint ? ' <small>· data baleira = sen data</small>' : '');
@@ -363,7 +363,7 @@
   function attBlock(k) {
     var L = attGet(k), n = L.length;
     var rows = L.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) { var p = a.x.d || '', q = b.x.d || ''; return p < q ? 1 : p > q ? -1 : 0; });
-    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + (n ? '<div class="vs att-vs">' + rows.map(function (r) { return attCompact(r.x, r.i, k); }).join('') + '</div>' : '') + ascBtns('') + '</div>';
+    return '<div class="field att-f"><label>' + (n ? attWord(n) : 'Intentos') + ' <small>· non se chegou ao cume</small></label>' + ascBtns('') + (n ? '<div class="vs att-vs" style="margin-top:8px">' + rows.map(function (r) { return attCompact(r.x, r.i, k); }).join('') + '</div>' : '') + '</div>';
   }
   // mateix aspecte que les sortides (data a l'esquerra, text a sota), marcat com a intent; en tocar-lo s'obre l'edició
   var ATOPEN = {};
@@ -1013,6 +1013,7 @@
     });
     var fd = function (it) { var r = S.done[it.key]; return r && r.d ? r.d : ''; };
     arr.sort(LS.sort === 'nom' ? function (a, b) { return norm(a.name) < norm(b.name) ? -1 : 1; } :
+      LS.sort === 'vegades' ? function (a, b) { var x = isDone(a.key) ? nAsc(a.key) : 0, y = isDone(b.key) ? nAsc(b.key) : 0; return y - x || (b.alt || 0) - (a.alt || 0); } :
       LS.sort === 'data' ? function (a, b) { var x = fd(a), y = fd(b); return x && y ? (x < y ? 1 : x > y ? -1 : 0) : x ? -1 : y ? 1 : (b.alt || 0) - (a.alt || 0); } :
       function (a, b) { return (b.alt || 0) - (a.alt || 0); });
     return arr;
@@ -1038,7 +1039,7 @@
     else if (LS.list === 'uiaa') { var zs = {}; U.forEach(function (u) { zs[u.z] = 1; }); opts = Object.keys(zs).sort(function (a, b) { return parseInt(a.slice(1)) - parseInt(b.slice(1)); }); lab = ['Zona', 'Todas as zonas']; }
     else if (LS.list === 'alps') { var ms = {}; AL.forEach(function (a) { ms[a.z] = 1; }); opts = Object.keys(ms).sort(); lab = ['Macizo', 'Todos os macizos']; }
     if (opts) h += '<h4 class="fh">' + lab[0] + '</h4><select class="fsel" id="fGrp"><option value="">' + lab[1] + '</option>' + opts.map(function (c) { return '<option value="' + esc(c) + '"' + (LS.grp === c ? ' selected' : '') + '>' + esc(zl(c)) + '</option>'; }).join('') + '</select>';
-    h += '<h4 class="fh">Orde</h4>' + chips('fsort', LS.sort, [['alt', 'Altitude'], ['nom', 'Nome'], ['data', 'Data']]);
+    h += '<h4 class="fh">Orde</h4>' + chips('fsort', LS.sort, [['alt', 'Altitude'], ['nom', 'Nome'], ['data', 'Data'], ['vegades', 'Veces subido']]);
     h += '<div class="btns"><button class="btn" data-fclear="1">Limpar</button><button class="btn pri" data-fok="1" id="fOk">Amosar ' + listItems().length + ' cumes</button></div>';
     openSheet(h);
     var sh = $('#sheet');
@@ -1273,8 +1274,9 @@
   }
   var gsLast = '';
   function openSearch() {
-    openSheet('<h3>Busca</h3><input id="gsQ" class="gs-q" type="search" autocomplete="off" placeholder="Cume, punto, vía, compañeiro, ruta…" value="' + esc(gsLast) + '"><div id="gsR" class="gs-res"></div>');
-    var inp = $('#gsQ'); gsRender(gsLast);
+    openSheet('<h3>Busca</h3><input id="gsQ" class="gs-q" type="search" autocomplete="off" placeholder="Cume, punto, vía, compañeiro, ruta…" value=""><div id="gsR" class="gs-res"></div>');
+    gsLast = '';
+    var inp = $('#gsQ'); gsRender('');
     inp.addEventListener('input', function () { gsLast = inp.value; gsRender(inp.value); });
     setTimeout(function () { try { inp.focus(); } catch (e) { } }, 250);
     $('#sheet').onclick = function (e) {
@@ -1291,6 +1293,16 @@
     var k = li.dataset.rk;
     if (k.slice(0, 2) === 'p:') { var pt = S.points.filter(function (x) { return x.id === k.slice(2); })[0]; if (pt) openPoint(pt); return; }
     var it = itemByKey(k); if (it) openItem(it);
+  });
+  // als cercadors, tocar una paraula posa el cursor al final d'aquella paraula (per seguir escrivint des d'allà)
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t || t.tagName !== 'INPUT' || t.type !== 'search') return;
+    setTimeout(function () {
+      try {
+        var v = t.value, a = t.selectionStart; if (a == null || a !== t.selectionEnd || a >= v.length) return;
+        var m = /[\s,;]/.exec(v.slice(a)); var end = m ? a + m.index : v.length; t.setSelectionRange(end, end);
+      } catch (x) { }
+    }, 0);
   });
   function openItem(it) {
     var d = isDone(it.key), rec = S.done[it.key] || {};
@@ -1666,7 +1678,7 @@
     var incH = inc.length && climbGroup(p) ? '<div class="vs"><div class="vs-top"><h4>Incluído en saídas · ' + inc.length + '</h4></div>' + inc.map(function (x) { return '<div class="vs-i"><div class="vs-h"><span>' + (x.v.d ? fmtDate(x.v.d) : '') + '</span><span class="vs-t">' + esc(x.v.v || x.p.n) + '</span></div><div class="vs-m">' + esc(x.p.n) + (x.v.c ? ' · ' + esc(x.v.c) : '') + '</div></div>'; }).join('') + '</div>' : '';
     if (!V.length && !climbGroup(p)) return incH;
     var L = V.map(function (v, i) { return [v, i]; }).sort(function (a, b) { var x = a[0].d || '', y = b[0].d || ''; return x < y ? 1 : x > y ? -1 : 0; });
-    return '<div class="vs"><div class="vs-top"><h4>Saídas' + (V.length ? ' · ' + V.length : '') + '</h4><button class="btn ok vs-add" data-act="vsadd">＋ Engadir saída</button></div>' + L.map(function (x) {
+    return '<div class="vs"><div class="vs-top"><h4>' + (p.g === 'Escalades' ? 'Vías' : 'Saídas') + (V.length ? ' · ' + V.length : '') + '</h4><button class="btn ok vs-add" data-act="vsadd">' + (p.g === 'Escalades' ? '＋ Engadir vía' : '＋ Engadir saída') + '</button></div>' + L.map(function (x) {
       var v = x[0];
       var t1 = [v.s ? esc(v.s) : '', v.v ? esc(v.v) : '', v.gr ? '<b>' + esc(v.gr) + '</b>' : ''].filter(Boolean).join(' · ') || '—';
       var t2 = [v.t ? esc(v.t) : '', v.c ? esc(v.c) : ''].filter(Boolean).join(' · ');
@@ -1674,7 +1686,7 @@
         (t2 ? '<div class="vs-m">' + t2 + '</div>' : '') + (v.cm && v.cm.length ? '<div class="vs-cm">⛰ ' + v.cm.map(function (k) { return esc(nameOfKey(k)); }).join(' · ') + '</div>' : '') + (v.at && v.at.length ? '<div class="vs-at">✕ Intento: ' + v.at.map(function (k) { return esc(nameOfKey(k)); }).join(' · ') + '</div>' : '') + (v.nt ? '<div class="vs-n">' + esc(v.nt) + '</div>' : '') +
         (v.fi || []).map(function (f) { return '<div class="vs-f">★ ' + esc(f) + '</div>'; }).join('') +
         '</div>';
-    }).join('') + (V.length ? '' : '<div class="empty">Aínda non hai ningunha saída.</div>') + '</div>' + incH;
+    }).join('') + (V.length ? '' : '<div class="empty">' + (p.g === 'Escalades' ? 'Aínda non hai ningunha vía.' : 'Aínda non hai ningunha saída.') + '</div>') + '</div>' + incH;
   }
   // dates del punt = les de les sortides (+ les que ja tenia abans de tenir-ne cap)
   function vsDates(p, removed) {
@@ -1712,7 +1724,7 @@
     var ppl = {}, vias = {};
     S.points.forEach(function (q) { (q.vs || []).forEach(function (x) { splitPeople(x.c).forEach(function (n) { ppl[n] = (ppl[n] || 0) + 1; }); if (q === p && x.v) vias[x.v] = 1; }); });
     var opt = function (L, cur) { if (cur && L.indexOf(cur) < 0) L = L.concat([cur]); return L.map(function (o) { return '<option value="' + esc(o) + '"' + (o === (cur || '') ? ' selected' : '') + '>' + (o ? esc(o) : '—') + '</option>'; }).join(''); };
-    var h = '<h3>' + (isNew ? 'Nova saída' : 'Editar saída') + '</h3><div class="sub">' + esc(p.n) + '</div>' +
+    var h = '<h3>' + (p.g === 'Escalades' ? (isNew ? 'Nova vía' : 'Editar vía') : (isNew ? 'Nova saída' : 'Editar saída')) + '</h3><div class="sub">' + esc(p.n) + '</div>' +
       '<div class="field"><label>Data</label><input id="vD" type="' + (iso ? 'date' : 'text') + '" value="' + esc(v.d || '') + '"></div>' +
       '<div class="field"><label>Vía ou actividade</label><input id="vV" value="' + esc(v.v || '') + '" placeholder="Nome da vía"></div>' +
       '<div class="two"><div class="field"><label>Grao</label><input id="vG" value="' + esc(v.gr || '') + '" placeholder="V+, 6a…"></div>' +
@@ -1746,7 +1758,7 @@
     var selfK = 'p:' + p.id;
     function atRender() {
       var on = at.indexOf(selfK) >= 0;
-      $('#vAself').innerHTML = '<button type="button" class="vchip add at' + (on ? ' on' : '') + '" data-a="atself">' + (on ? '✕ Intento a «' : '＋ Esta saída foi un intento a «') + esc(p.n) + (on ? '» · non se chegou arriba' : '»') + '</button>';
+      $('#vAself').innerHTML = '<button type="button" class="vchip add at' + (on ? ' on' : '') + '" data-a="atself">' + (on ? '✕ Intento a «' : (p.g === 'Escalades' ? '＋ Esta vía foi un intento a «' : '＋ Esta saída foi un intento a «')) + esc(p.n) + (on ? '» · non se chegou arriba' : '»') + '</button>';
       var ato = at.filter(function (k) { return k !== selfK; });
       $('#vAt').innerHTML = ato.length ? '<div class="vchips">' + ato.map(function (k) { return '<span class="vchip at">✕ ' + esc(nameOfKey(k)) + '<button type="button" data-a="atx" data-k="' + esc(k) + '" aria-label="Quitar">×</button></span>'; }).join('') + '</div>' : '';
     }
@@ -1772,10 +1784,10 @@
       if (a === 'cmx') { cm = cm.filter(function (k) { return k !== b.dataset.k; }); cmRender(); return; }
       if (a === 'cancel') { openPoint(p); return; }
       if (a === 'del') {
-        if (!confirm('Queres borrar esta saída?')) return;
+        if (!confirm(p.g === 'Escalades' ? 'Queres borrar esta vía?' : 'Queres borrar esta saída?')) return;
         (p.vs[idx].cm || []).forEach(function (k) { unlinkAsc(k, p.vs[idx].id); }); (p.vs[idx].at || []).forEach(function (k) { unlinkAtt(k, p.vs[idx].id); });
         var old = p.vs[idx].d; p.vs.splice(idx, 1); if (!p.vs.length) delete p.vs; vsDates(p, old);
-        save(); refreshAll(); openPoint(p); toast('Saída borrada'); return;
+        save(); refreshAll(); openPoint(p); toast(p.g === 'Escalades' ? 'Vía borrada' : 'Saída borrada'); return;
       }
       if (a === 'save') {
         var r = { d: $('#vD').value.trim(), v: $('#vV').value.trim(), gr: $('#vG').value.trim(), t: $('#vT').value, c: $('#vC').value.trim(), nt: $('#vN').value.trim() };
@@ -1791,7 +1803,7 @@
         p.vs.sort(function (x, y) { return (x.d || '') < (y.d || '') ? -1 : (x.d || '') > (y.d || '') ? 1 : 0; });
         vsDates(p, oldD !== r.d ? oldD : null);
         syncVisit(p, n, oldCm); syncVisitAtt(p, n, oldAt);
-        save(); refreshAll(); checkMedals(false); openPoint(p); toast(isNew ? 'Saída engadida' : 'Saída gardada');
+        save(); refreshAll(); checkMedals(false); openPoint(p); toast(p.g === 'Escalades' ? (isNew ? 'Vía engadida' : 'Vía gardada') : (isNew ? 'Saída engadida' : 'Saída gardada'));
       }
     };
   }
@@ -1820,7 +1832,7 @@
         (own.indexOf(d) >= 0 && !lv ? '<button class="lnk-s" data-act="p2t" data-pi="' + i + '">Non cheguei ao cume: pasala a intentos</button>' : '') + '</div>';
     })(d, i) }); });
     AT.forEach(function (x, i) { rows.push({ d: x.d || '', k: 1, html: attRow(x, i, 'p:' + p.id) }); });
-    return '<div class="field pasc"><label>' + ascLabel(D.length, AT.length, true) + '</label><div class="asc-list">' + mixRows(rows) + '</div>' + ascBtns('padd') + '</div>';
+    return '<div class="field pasc">' + ascBtns('padd') + '<label style="margin-top:12px">' + ascLabel(D.length, AT.length, true) + '</label><div class="asc-list">' + mixRows(rows) + '</div></div>';
   }
   function openPoint(p) {
     setTimeout(function () {
