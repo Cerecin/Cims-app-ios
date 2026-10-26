@@ -1,7 +1,7 @@
 {
- "v": 112,
+ "v": 113,
  "name": "26/10/2026",
- "notes": "Cursor al final de la paraula a tots els camps de text (segon toc: on tocaves).",
+ "notes": "Les fileres de pestanyes es queden on eren en triar-ne una; botons més fàcils de tocar.",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "542c48868cb7ff01c08875e40bb5f27334e527568d0cd001fb0cbb3fd6a0b73b",
-   "n": 348008
+   "s": "513c4a6070a0ba53147bc1bb51db51042d1e198f83f0b706bd1a064cfbf5a6bf",
+   "n": 349900
   },
   {
    "p": "app.js",
-   "s": "540cd8ae09059ae6b6d2e6312d3615d22772360ab0d76d2b4d4a93918f882567",
-   "n": 346992
+   "s": "41ecd5422b0a4c37c12e3afdcca6bfa62bf7c650d626eba93730c50b8b31b672",
+   "n": 348884
   },
   {
    "p": "comarques.js",

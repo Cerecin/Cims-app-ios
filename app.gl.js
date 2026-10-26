@@ -40,8 +40,8 @@
       '.at-all .lr small{color:var(--mute);font-size:12px;white-space:nowrap}' +
       '.at-all .lr .at-w{opacity:.7}' +
       '.an-ro{cursor:default;opacity:.8}' +
-      '.st-wt{display:flex;gap:6px;overflow-x:auto;margin:2px 0 8px;padding-bottom:2px}' +
-      '.st-wt button{flex:none;border:1px solid var(--line);background:none;border-radius:999px;padding:5px 11px;font:inherit;font-size:12.5px;color:var(--head,inherit)}' +
+      '.st-wt{display:flex;gap:8px;overflow-x:auto;margin:2px 0 10px;padding:2px 0 4px;scrollbar-width:none}.st-wt::-webkit-scrollbar{display:none}' +
+      '.st-wt button{flex:none;border:1px solid var(--line);background:none;border-radius:999px;padding:0 16px;min-height:42px;font:inherit;font-size:14px;color:var(--head,inherit)}' +
       '.st-wt button.on{background:var(--pine);color:#fff;border-color:transparent}' +
       '.asc-w:not(.att-w) .att-l{color:var(--pine)}' +
       '.at-more{display:block;margin:10px auto 0;font-weight:600}' +
@@ -1312,6 +1312,35 @@
       } catch (x) { }
     }, 0);
   });
+  // fileres de botons que es desplacen en horitzontal (Tot / Cims / Alpinisme…): en tocar-ne un i redibuixar-se, es queden on eren
+  // (i el botó triat es veu sencer)
+  var HSC = {}, HSEL = '.st-wt,.dia-ys,.dia-chips,.tabs2,.nxm-car';
+  function hKey(el) {
+    var root = el.closest('.view') || document.body, cls = el.className.split(' ')[0];
+    return (root.id || 'b') + '|' + cls + '|' + Array.prototype.indexOf.call(root.querySelectorAll('.' + cls), el);
+  }
+  document.addEventListener('scroll', function (e) { var el = e.target; if (el && el.nodeType === 1 && el.matches && el.matches(HSEL)) HSC[hKey(el)] = el.scrollLeft; }, true);
+  var hFix = false, HCLK = null;
+  document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.st-wt button, .dia-ys button, .dia-chips button'); if (b) HCLK = hKey(b.parentNode); }, true);
+  new MutationObserver(function () {
+    if (hFix) return; hFix = true;
+    Promise.resolve().then(function () {
+      hFix = false;
+      Array.prototype.forEach.call(document.querySelectorAll(HSEL), function (el) {
+        var k = hKey(el), v = HSC[k];
+        if (v && el.scrollLeft === 0 && el.scrollWidth > el.clientWidth) el.scrollLeft = v;
+        if (HCLK && HCLK === k) {
+          HCLK = null;
+          var on = el.querySelector('button.on');
+          if (on && el.scrollWidth > el.clientWidth) {
+            var l = on.offsetParent === el ? on.offsetLeft : on.offsetLeft - el.offsetLeft, r = l + on.offsetWidth, pad = 14;
+            if (l - pad < el.scrollLeft) el.scrollLeft = Math.max(0, l - pad); else if (r + pad > el.scrollLeft + el.clientWidth) el.scrollLeft = r + pad - el.clientWidth;
+            HSC[k] = el.scrollLeft;
+          }
+        }
+      });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
   function openItem(it) {
     var d = isDone(it.key), rec = S.done[it.key] || {};
     var kv = '<b>Altitude</b><span>' + fmtAlt(it.alt) + '</span>';
