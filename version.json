@@ -1,7 +1,7 @@
 {
- "v": 111,
+ "v": 112,
  "name": "26/10/2026",
- "notes": "Escalades: «Vies». Cercador buit, ordre per vegades pujat, botons d'ascensió dalt i dates de més noves a més velles.",
+ "notes": "Cursor al final de la paraula a tots els camps de text (segon toc: on tocaves).",
  "files": [
   {
    "p": "alps.js",
@@ -10,13 +10,13 @@
   },
   {
    "p": "app.gl.js",
-   "s": "9d182a6d45e2480ea288b39d5841c62dc3d72bb99a6fd28fae72916e775943ab",
-   "n": 347473
+   "s": "542c48868cb7ff01c08875e40bb5f27334e527568d0cd001fb0cbb3fd6a0b73b",
+   "n": 348008
   },
   {
    "p": "app.js",
-   "s": "748e5d7b85c5178ecc6665b4dd8d93d41de190cf680c23e0d1e8e1a63748e942",
-   "n": 346457
+   "s": "540cd8ae09059ae6b6d2e6312d3615d22772360ab0d76d2b4d4a93918f882567",
+   "n": 346992
   },
   {
    "p": "comarques.js",

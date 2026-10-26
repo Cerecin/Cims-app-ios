@@ -1293,13 +1293,21 @@
     if (k.slice(0, 2) === 'p:') { var pt = S.points.filter(function (x) { return x.id === k.slice(2); })[0]; if (pt) openPoint(pt); return; }
     var it = itemByKey(k); if (it) openItem(it);
   });
-  // als cercadors, tocar una paraula posa el cursor al final d'aquella paraula (per seguir escrivint des d'allà)
+  // a tots els camps de text: el primer toc sobre una paraula posa el cursor al FINAL d'aquella paraula (per seguir escrivint des d'allà);
+  // un segon toc dins la mateixa paraula el deixa on has tocat
+  var CUR_ADJ = null;
+  document.addEventListener('input', function () { CUR_ADJ = null; });
+  document.addEventListener('focusout', function () { CUR_ADJ = null; });
   document.addEventListener('click', function (e) {
-    var t = e.target; if (!t || t.tagName !== 'INPUT' || t.type !== 'search') return;
+    var t = e.target; if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA')) return;
     setTimeout(function () {
       try {
-        var v = t.value, a = t.selectionStart; if (a == null || a !== t.selectionEnd || a >= v.length) return;
-        var m = /[\s,;]/.exec(v.slice(a)); var end = m ? a + m.index : v.length; t.setSelectionRange(end, end);
+        var v = t.value, a = t.selectionStart; if (a == null || a !== t.selectionEnd || !v) return;
+        var ws = a; while (ws > 0 && !/[\s,;]/.test(v.charAt(ws - 1))) ws--;
+        var m = /[\s,;]/.exec(v.slice(a)), we = m ? a + m.index : v.length;
+        if (CUR_ADJ && CUR_ADJ.el === t && a >= CUR_ADJ.ws && a <= CUR_ADJ.we) return;   // segon toc a la mateixa paraula: es respecta
+        if (we === ws) return;
+        t.setSelectionRange(we, we); CUR_ADJ = { el: t, ws: ws, we: we };
       } catch (x) { }
     }, 0);
   });
