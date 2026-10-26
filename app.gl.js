@@ -40,8 +40,9 @@
       '.at-all .lr small{color:var(--mute);font-size:12px;white-space:nowrap}' +
       '.at-all .lr .at-w{opacity:.7}' +
       '.an-ro{cursor:default;opacity:.8}' +
-      '.st-wt{display:flex;gap:8px;overflow-x:auto;margin:2px 0 10px;padding:2px 0 4px;scrollbar-width:none}.st-wt::-webkit-scrollbar{display:none}' +
-      '.st-wt button{flex:none;border:1px solid var(--line);background:none;border-radius:999px;padding:0 16px;min-height:42px;font:inherit;font-size:14px;color:var(--head,inherit)}' +
+      '.st-wt{display:flex;gap:6px;overflow-x:auto;margin:-8px 0 0;padding:10px 0}' +
+      '.st-wt button{flex:none;border:1px solid var(--line);background:none;border-radius:999px;padding:5px 11px;font:inherit;font-size:12.5px;color:var(--head,inherit);position:relative}' +
+      '.st-wt button::after{content:"";position:absolute;inset:-10px -3px}' +
       '.st-wt button.on{background:var(--pine);color:#fff;border-color:transparent}' +
       '.asc-w:not(.att-w) .att-l{color:var(--pine)}' +
       '.at-more{display:block;margin:10px auto 0;font-weight:600}' +
